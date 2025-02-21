@@ -1,5 +1,8 @@
 import { http } from '@kit.NetworkKit'
 import { apiOrigin } from '../../common/config'
+import { getToken } from '../../common/token'
+import { BookListItem } from '../Book/Panel'
+import { MagazineListItem } from '../Magazine/Panel'
 
 export async function getCategories(type: EbookType) {
     const request = http.createHttp()
@@ -8,7 +11,8 @@ export async function getCategories(type: EbookType) {
         expectDataType: http.HttpDataType.OBJECT,
         extraData: JSON.stringify({ type }),
         header: {
-            token: 'eyJhbGciOiJIUzI1NiJ9.Nw.IJKx-b6YX4YDnkHSDaoz8J22W_g_1Qu3LTfYmm-7uvo'
+            token: await getToken(),
+            'Content-Type': 'application/json'
         }
     })
     const result = response.result as ApiResponse<CategoryInResponse[]>
@@ -33,6 +37,36 @@ export interface ApiResponse<T = null> {
     message: string
 }
 
-export function getItems(categoryId: number, page = 0, pageSize = 72) {
-
+export async function getItems<T extends BookListItemInResponse | MagazineItemInResponse>(
+    categoryId: number,
+    page = 0,
+    pageSize = 72
+) {
+    const request = http.createHttp()
+    const response = await request.request(apiOrigin + '/api/ebook/item', {
+        method: http.RequestMethod.POST,
+        extraData: JSON.stringify({ categoryId, page, pageSize }),
+        header: {
+            token: await getToken(),
+            'Content-Type': 'application/json'
+        }
+    })
+    const result = JSON.parse(response.result as string) as ApiResponse<T[]>
+    if (!result.success) {
+        throw new Error(result.message)
+    }
+    return result.data
 }
+
+export interface CommonListItem {
+    id: number
+    name: string
+    /** 内容介绍 */
+    summary: string
+    /** 普通封面 */
+    cover: string
+}
+
+export interface BookListItemInResponse extends BookListItem {}
+
+export interface MagazineItemInResponse extends MagazineListItem {}

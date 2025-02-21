@@ -15,6 +15,7 @@
                 "name": "ohos.permission.INTERNET"
             }
         ],
+        "routerMap": "$profile:routerMap",
         "abilities": [
             {
                 "name": "EntryAbility",
