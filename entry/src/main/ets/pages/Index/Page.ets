@@ -6,12 +6,12 @@ import {
     TokenError,
     UserInResponse
 } from '../../common/token'
-import { BookListItem, BookPanel } from './panel/book/BookPanel'
-import { RecommendPanel } from './panel/recommend/RecommendPanel'
+import { BookListItem, BookPanel } from './panels/book/BookPanel'
+import { RecommendPanel } from './panels/recommend/RecommendPanel'
 import { common } from '@kit.AbilityKit'
-import { UserPanel } from './panel/user/UserPanel'
-import { MagazineListItem, MagazinePanel } from './panel/magazine/MagazinePanel'
-import { CategoryTabItem } from './common/CategoryTab'
+import { UserPanel } from './panels/user/UserPanel'
+import { MagazineListItem, MagazinePanel } from './panels/magazine/MagazinePanel'
+import { CategoryTabItem } from './components/CategoryTab'
 
 @Entry
 @ComponentV2
