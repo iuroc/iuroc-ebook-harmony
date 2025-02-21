@@ -1,4 +1,4 @@
-import { clearUserPreferences } from '../../common/token'
+import { clearUserPreferences } from '../../../../common/token'
 
 @ComponentV2
 export struct UserPanel {

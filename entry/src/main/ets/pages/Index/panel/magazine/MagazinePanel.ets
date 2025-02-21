@@ -1,5 +1,5 @@
-import { CategoryTab, CategoryTabItem } from '../common/CategoryTab'
-import { CommonListItem, getCategories, getItems, MagazineItemInResponse } from '../common/mixin'
+import { CategoryTab, CategoryTabItem } from '../../common/CategoryTab'
+import { CommonListItem, getCategories, getItems, MagazineItemInResponse } from '../../common/mixin'
 import { MagazineListItemCard } from './MagazineListItemCard'
 import { promptAction } from '@kit.ArkUI'
 

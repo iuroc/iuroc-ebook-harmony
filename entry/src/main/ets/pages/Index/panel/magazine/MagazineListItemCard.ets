@@ -1,4 +1,4 @@
-import { ItemCard } from '../common/ItemCard'
+import { ItemCard } from '../../common/ItemCard'
 
 @ComponentV2
 export struct MagazineListItemCard {

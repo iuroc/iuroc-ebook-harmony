@@ -1,7 +1,7 @@
 import { preferences } from '@kit.ArkData'
 import { http } from '@kit.NetworkKit'
 import { apiOrigin } from './config'
-import { ApiResponse } from '../Index/common/mixin'
+import { ApiResponse } from '../pages/Index/common/mixin'
 
 export async function getUserPreferences() {
     return preferences.getPreferences(getContext(), { name: 'user' })
