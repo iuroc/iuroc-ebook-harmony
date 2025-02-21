@@ -40,7 +40,6 @@ export struct CategoryTab {
             })
             .onAreaChange((oldValue, newValue) => {
                 if ((newValue.width as number) - (oldValue.width as number) > 0) {
-                    console.log('scrollToIndex')
                     this.scrollToIndex(this.activeCategoryIndex, false)
                 }
             })

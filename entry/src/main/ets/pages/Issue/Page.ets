@@ -2,6 +2,7 @@ import { MagazineListItem } from '../Index/panels/magazine/MagazinePanel'
 import { promptAction } from '@kit.ArkUI'
 import { IssueListItemCard } from './IssueListItem'
 import { getIssues, IssueInResponse } from './mixin'
+import { MagazineListItemCard } from '../Index/panels/magazine/MagazineListItemCard'
 
 @ComponentV2
 struct Page {

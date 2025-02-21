@@ -45,8 +45,7 @@ struct Page {
     aboutToAppear(): void {
         checkToken().then(async user => {
             await saveUserInfoToPreferences(user as UserInResponse)
-            console.log(JSON.stringify(await getUseInfoFromPreferences()))
-            this.showContent = true
+co            this.showContent = true
         }).catch((error: Error) => {
             if (error instanceof TokenError) {
                 this.pathInfos.pushPath({

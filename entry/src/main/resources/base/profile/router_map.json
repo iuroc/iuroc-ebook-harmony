@@ -9,6 +9,11 @@
             "name": "Issue",
             "pageSourceFile": "src/main/ets/pages/Issue/Page.ets",
             "buildFunction": "PageBuilder"
+        },
+        {
+            "name": "Catalog",
+            "pageSourceFile": "src/main/ets/pages/Catalog/Page.ets",
+            "buildFunction": "PageBuilder"
         }
     ]
 }

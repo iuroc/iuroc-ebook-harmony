@@ -1,3 +1,4 @@
+import { CatalogPageParam } from '../../../Catalog/Page'
 import { ItemCard } from '../../components/ItemCard'
 
 @ComponentV2
@@ -9,6 +10,7 @@ export struct BookListItemCard {
     @Require @Param publish: string
     @Require @Param cover: string
     @Require @Param bigCover: string
+    @Consumer() pathInfos: NavPathStack = new NavPathStack()
 
     build() {
         ItemCard({
@@ -21,5 +23,13 @@ export struct BookListItemCard {
             bigCover: this.bigCover,
             type: 'book',
         })
+            .onClick(() => {
+                this.pathInfos.pushPath({
+                    name: 'Catalog', param: {
+                        itemId: this.itemId,
+                        type: 'book'
+                    } as CatalogPageParam
+                })
+            })
     }
 }

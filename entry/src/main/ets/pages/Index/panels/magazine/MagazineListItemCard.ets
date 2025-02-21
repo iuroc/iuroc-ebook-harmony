@@ -1,3 +1,4 @@
+import { IssuePageParam } from '../../../Issue/Page'
 import { ItemCard } from '../../components/ItemCard'
 
 @ComponentV2
@@ -10,6 +11,7 @@ export struct MagazineListItemCard {
     @Require @Param cn: string = ''
     /** 国际刊号 */
     @Require @Param issn: string = ''
+    @Consumer() pathInfos: NavPathStack = new NavPathStack()
 
     build() {
         ItemCard({
@@ -21,5 +23,17 @@ export struct MagazineListItemCard {
             cn: this.cn,
             issn: this.issn
         })
+            .onClick(() => {
+                this.pathInfos.pushPath({
+                    name: 'Issue', param: {
+                        id: this.itemId,
+                        name: this.name,
+                        summary: this.summary,
+                        cover: this.cover,
+                        cn: this.cn,
+                        issn: this.issn
+                    } as IssuePageParam
+                })
+            })
     }
 }

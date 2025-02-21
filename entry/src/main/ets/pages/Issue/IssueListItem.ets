@@ -1,5 +1,6 @@
 import { BSColor } from "@iuroc/bootstrap5-color"
 import { apiOrigin } from "../../common/config"
+import { CatalogPageParam } from "../Catalog/Page"
 import { MagazineListItem } from "../Index/panels/magazine/MagazinePanel"
 import { IssueListItem } from "./Page"
 
@@ -7,6 +8,7 @@ import { IssueListItem } from "./Page"
 export struct IssueListItemCard {
     @Require @Param issue: IssueListItem
     @Require @Param magazine: MagazineListItem
+    @Consumer() pathInfos: NavPathStack = new NavPathStack()
 
     build() {
         Row({ space: 10 }) {
@@ -68,6 +70,14 @@ export struct IssueListItemCard {
             right: 15,
             top: 7.5,
             bottom: 7.5
+        })
+        .onClick(() => {
+            this.pathInfos.pushPath({
+                name: 'Catalog', param: {
+                    itemId: this.issue.id,
+                    type: 'issue'
+                } as CatalogPageParam
+            })
         })
     }
 }
