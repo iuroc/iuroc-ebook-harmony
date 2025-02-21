@@ -1,25 +1,25 @@
-import { ItemCard } from '../../common/ItemCard'
+import { ItemCard } from '../../components/ItemCard'
 
 @ComponentV2
-export struct BookListItemCard {
+export struct MagazineListItemCard {
     @Require @Param itemId: number
     @Require @Param name: string
-    @Require @Param author: string
     @Require @Param summary: string
-    @Require @Param publish: string
     @Require @Param cover: string
-    @Require @Param bigCover: string
+    /** 国内刊号 */
+    @Require @Param cn: string = ''
+    /** 国际刊号 */
+    @Require @Param issn: string = ''
 
     build() {
         ItemCard({
             itemId: this.itemId,
             name: this.name,
-            author: this.author,
             summary: this.summary,
-            publish: this.publish,
             cover: this.cover,
-            bigCover: this.bigCover,
-            type: 'book',
+            type: 'magazine',
+            cn: this.cn,
+            issn: this.issn
         })
     }
 }

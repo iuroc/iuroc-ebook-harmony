@@ -1,7 +1,7 @@
 import { BookListItemInResponse, CommonListItem, getCategories, getItems } from '../../common/mixin'
 import { promptAction } from '@kit.ArkUI'
 import { BookListItemCard } from './BookListItemCard'
-import { CategoryTab, CategoryTabItem } from '../../common/CategoryTab'
+import { CategoryTab, CategoryTabItem } from '../../components/CategoryTab'
 
 @ComponentV2
 export struct BookPanel {

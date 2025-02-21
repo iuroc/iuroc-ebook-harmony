@@ -1,7 +1,7 @@
 import { BSColor } from '@iuroc/bootstrap5-color'
 import { apiOrigin } from '../../../common/config'
 import { replaceChinesePunctuation } from '../../../common/util'
-import { EbookType } from './mixin'
+import { EbookType } from '../common/mixin'
 
 @ComponentV2
 export struct ItemCard {
