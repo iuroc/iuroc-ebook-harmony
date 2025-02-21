@@ -1,7 +1,7 @@
 import { BookListItemInResponse, CommonListItem, getCategories, getItems } from '../common/mixin'
-import { ComposeListItem, IconType, promptAction } from '@kit.ArkUI'
-import { apiOrigin } from '../../common/config'
+import { promptAction } from '@kit.ArkUI'
 import { BookListItemCard } from './BookListItemCard'
+import { CategoryTab, CategoryTabItem } from '../common/CategoryTab'
 
 @ComponentV2
 export struct BookPanel {
@@ -77,48 +77,10 @@ export struct BookPanel {
     }
 }
 
-export interface CategoryTabItem {
-    name: string
-    id: number
-}
-
 export interface BookListItem extends CommonListItem {
     /** 大尺寸封面 */
     bigCover: string
     author: string
     /** 出版社名称 */
     publish: string
-}
-
-@ComponentV2
-export struct CategoryTab {
-    @Require @Param categories: CategoryTabItem[]
-    @Require @Param activeCategoryIndex: number
-    @Event handleClick: (index: number) => void
-
-    build() {
-        Scroll() {
-            Row({ space: 5 }) {
-                ForEach(this.categories, (category: CategoryTabItem, index) => {
-                    Button(category.name)
-                        .buttonStyle(this.activeCategoryIndex == index
-                            ? ButtonStyleMode.EMPHASIZED
-                            : ButtonStyleMode.NORMAL)
-                        .onClick(() => {
-                            this.handleClick(index)
-                        })
-                })
-            }
-            .padding({
-                left: 10,
-                right: 10,
-                bottom: 5,
-                top: 5
-            })
-        }
-        .width('100%')
-        .scrollable(ScrollDirection.Horizontal)
-        .scrollBarWidth(0)
-        .edgeEffect(EdgeEffect.Spring)
-    }
 }
