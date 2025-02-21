@@ -44,12 +44,8 @@ export struct BookPanel {
             CategoryTab({
                 categories: this.categories,
                 activeCategoryIndex: this.activeCategoryIndex,
-                handleClick: index => {
-                    if (this.activeCategoryIndex != index) {
-                        this.changeActiveCategoryIndex(index)
-                        this.clearAndLoadList(this.categories[index].id)
-                    }
-                }
+                changeActiveIndex: index => this.changeActiveCategoryIndex(index),
+                clearAndLoadList: async categoryId => await this.clearAndLoadList(categoryId)
             })
             Scroll(this.scroller) {
                 Column() {

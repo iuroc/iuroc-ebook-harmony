@@ -2,7 +2,10 @@
 export struct CategoryTab {
     @Require @Param categories: CategoryTabItem[]
     @Require @Param activeCategoryIndex: number
-    @Event handleClick: (index: number) => void
+    /** 切换分类选项卡 */
+    @Event changeActiveIndex: (index: number) => void
+    /** 清空列表并重新加载指定分类的书刊列表 */
+    @Event clearAndLoadList: (categoryId: number) => Promise<void>
 
     build() {
         Scroll() {
@@ -12,8 +15,11 @@ export struct CategoryTab {
                         .buttonStyle(this.activeCategoryIndex == index
                             ? ButtonStyleMode.EMPHASIZED
                             : ButtonStyleMode.NORMAL)
-                        .onClick(() => {
-                            this.handleClick(index)
+                        .onClick(async () => {
+                            this.changeActiveIndex(index)
+                            if (this.activeCategoryIndex != index) {
+                                await this.clearAndLoadList(this.categories[index].id)
+                            }
                         })
                 })
             }
@@ -30,7 +36,6 @@ export struct CategoryTab {
         .edgeEffect(EdgeEffect.Spring)
     }
 }
-
 
 export interface CategoryTabItem {
     name: string

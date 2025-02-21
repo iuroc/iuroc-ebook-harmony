@@ -33,7 +33,9 @@ export struct ItemCard {
                     .wordBreak(WordBreak.BREAK_ALL)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
                 Row({ space: 5 }) {
-                    Text(replaceChinesePunctuation(this.type == 'book' ? this.author : `CN ${this.cn}`))
+                    Text(replaceChinesePunctuation(
+                        this.type == 'book' ? this.author : `CN ${this.cn || '暂无编号'}`)
+                    )
                         .wordBreak(WordBreak.BREAK_ALL)
                         .maxLines(1)
                         .fontColor(BSColor.info_text_emphasis)
@@ -43,7 +45,9 @@ export struct ItemCard {
                             maxWidth: '50%'
                         })
                     Divider().vertical(true).height(15)
-                    Text(replaceChinesePunctuation(this.type == 'book' ? this.publish : `ISSN ${this.issn}`))
+                    Text(replaceChinesePunctuation(
+                        this.type == 'book' ? this.publish : `ISSN ${this.issn || '暂无编号'}`)
+                    )
                         .wordBreak(WordBreak.BREAK_ALL)
                         .maxLines(1)
                         .fontColor(BSColor.secondary_text_emphasis)
@@ -54,7 +58,7 @@ export struct ItemCard {
                 .clip(true)
                 .width('100%')
 
-                Text(this.summary)
+                Text(this.summary || '暂无书刊介绍')
                     .fontSize(12)
                     .fontColor(BSColor.secondary)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
