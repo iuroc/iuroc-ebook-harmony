@@ -72,6 +72,7 @@ export struct ItemCard {
             .layoutWeight(1)
             .alignItems(HorizontalAlign.Start)
         }
+        .alignItems(VerticalAlign.Top)
         .stateStyles({
             pressed: {
                 .backgroundColor(BSColor.info_bg_subtle)
