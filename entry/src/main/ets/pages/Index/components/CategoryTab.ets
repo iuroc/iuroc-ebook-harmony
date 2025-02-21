@@ -38,14 +38,17 @@ export struct CategoryTab {
                 bottom: 5,
                 top: 5
             })
+            .onAreaChange((oldValue, newValue) => {
+                if ((newValue.width as number) - (oldValue.width as number) > 0) {
+                    console.log('scrollToIndex')
+                    this.scrollToIndex(this.activeCategoryIndex, false)
+                }
+            })
         }
         .width('100%')
         .scrollable(ScrollDirection.Horizontal)
         .scrollBarWidth(0)
         .edgeEffect(EdgeEffect.Spring)
-        .onAppear(() => {
-            this.scrollToIndex(this.activeCategoryIndex, false)
-        })
     }
 
     scrollToIndex(index: number, animation = true) {

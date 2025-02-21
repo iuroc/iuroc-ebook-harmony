@@ -38,7 +38,7 @@ struct Page {
     @Local bookPanelBooks: BookListItem[] = []
     // MagazinePanel
     @Local magazinePanelNeedInit: boolean = true
-    @Local magazinePanelActiveCategoryIndex: number = 0
+    @Local magazinePanelActiveCategoryIndex: number = 5
     @Local magazinePanelCategories: CategoryTabItem[] = []
     @Local magazinePanelItems: MagazineListItem[] = []
 
