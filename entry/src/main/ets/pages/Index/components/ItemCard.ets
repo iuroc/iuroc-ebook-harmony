@@ -24,7 +24,7 @@ export struct ItemCard {
 
     build() {
         Row({ space: 10 }) {
-            Image(apiOrigin + this.cover).width(100).height(140)
+            Image(apiOrigin + this.cover).width(100 * 0.8).height(140 * 0.8)
                 .borderRadius(5)
                 .shadow(ShadowStyle.OUTER_DEFAULT_XS)
             Column({ space: 5 }) {
@@ -67,12 +67,11 @@ export struct ItemCard {
                     .wordBreak(WordBreak.BREAK_ALL)
                     .textAlign(TextAlign.JUSTIFY)
                     .width('100%')
-                    .maxLines(7)
+                    .maxLines(5)
             }
             .layoutWeight(1)
             .alignItems(HorizontalAlign.Start)
         }
-        .alignItems(VerticalAlign.Top)
         .stateStyles({
             pressed: {
                 .backgroundColor(BSColor.info_bg_subtle)
