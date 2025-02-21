@@ -1,5 +1,5 @@
 import { promptAction, window } from '@kit.ArkUI'
-import { saveToken, saveUserInfoToPreferences as saveUserToPreferences, UserInResponse } from '../common/token'
+import { saveToken, saveUserInfoToPreferences as saveUserToPreferences, UserInResponse } from '../../common/token'
 import { loginOrRegister } from './mixin'
 
 @ComponentV2

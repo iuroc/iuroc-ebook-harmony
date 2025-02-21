@@ -1,7 +1,7 @@
 import { http } from '@kit.NetworkKit'
-import { apiOrigin } from '../common/config'
+import { apiOrigin } from '../../common/config'
 import { ApiResponse } from '../Index/common/mixin'
-import { UserInPreferences } from '../common/token'
+import { UserInPreferences } from '../../common/token'
 
 /**
  * 登录和注册聚合接口，完成后请调用 `saveUserToPreferences` 和 `saveToken` 保存用户信息和令牌

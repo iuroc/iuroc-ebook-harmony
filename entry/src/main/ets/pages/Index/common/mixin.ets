@@ -1,8 +1,8 @@
 import { http } from '@kit.NetworkKit'
-import { apiOrigin } from '../../common/config'
-import { getToken } from '../../common/token'
-import { BookListItem } from '../Book/Panel'
-import { MagazineListItem } from '../Magazine/Panel'
+import { apiOrigin } from '../../../common/config'
+import { getToken } from '../../../common/token'
+import { BookListItem } from '../panel/book/BookPanel'
+import { MagazineListItem } from '../panel/magazine/MagazinePanel'
 
 export async function getCategories(type: EbookType) {
     const request = http.createHttp()

@@ -4,6 +4,11 @@
             "name": "Login",
             "pageSourceFile": "src/main/ets/pages/Login/Page.ets",
             "buildFunction": "PageBuilder"
+        },
+        {
+            "name": "Issue",
+            "pageSourceFile": "src/main/ets/pages/Issue/Page.ets",
+            "buildFunction": "PageBuilder"
         }
     ]
 }

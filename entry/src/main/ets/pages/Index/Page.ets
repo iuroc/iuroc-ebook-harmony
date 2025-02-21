@@ -5,12 +5,12 @@ import {
     saveUserInfoToPreferences,
     TokenError,
     UserInResponse
-} from '../common/token'
-import { BookListItem, BookPanel } from './Book/Panel'
-import { RecommendPanel } from './Recommend/Panel'
+} from '../../common/token'
+import { BookListItem, BookPanel } from './panel/book/BookPanel'
+import { RecommendPanel } from './panel/recommend/RecommendPanel'
 import { common } from '@kit.AbilityKit'
-import { UserPanel } from './User/Panel'
-import { MagazineListItem, MagazinePanel } from './Magazine/Panel'
+import { UserPanel } from './panel/user/UserPanel'
+import { MagazineListItem, MagazinePanel } from './panel/magazine/MagazinePanel'
 import { CategoryTabItem } from './common/CategoryTab'
 
 @Entry
