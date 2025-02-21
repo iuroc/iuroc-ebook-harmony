@@ -8,13 +8,14 @@ export struct BookPanel {
     /** 类型选项列表 */
     @Require @Param categories: CategoryTabItem[]
     /** 图书列表 */
-    @Require @Param books: BookListItem[]
+    @Require @Param items: BookListItem[]
     /** 活跃的类型选项下标 */
     @Require @Param activeCategoryIndex: number
     /** 是否执行初始化操作，包含联网加载类型列表和图书列表 */
     @Require @Param needInit: boolean
     @Event changeNeedInit: (value: boolean) => void
     @Event changeActiveCategoryIndex: (value: number) => void
+    scroller = new Scroller()
 
     aboutToAppear(): void {
         if (this.needInit) {
@@ -33,8 +34,9 @@ export struct BookPanel {
 
     async clearAndLoadList(categoryId: number) {
         const books = await getItems<BookListItemInResponse>(categoryId, 0, 36)
-        this.books.splice(0)
-        this.books.push(...books)
+        this.items.splice(0)
+        this.items.push(...books)
+        this.scroller.scrollTo({ yOffset: 0, xOffset: 0 })
     }
 
     build() {
@@ -49,16 +51,16 @@ export struct BookPanel {
                     }
                 }
             })
-            Scroll() {
+            Scroll(this.scroller) {
                 Column() {
-                    ForEach(this.books, (book: BookListItem, index) => {
+                    ForEach(this.items, (book: BookListItem, index) => {
                         BookListItemCard({
                             name: book.name,
                             author: book.author,
                             summary: book.summary,
                             publish: book.publish,
                             cover: book.cover,
-                            bookId: book.id,
+                            itemId: book.id,
                             bigCover: book.bigCover
                         })
                     })

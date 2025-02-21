@@ -6,11 +6,12 @@ import {
     TokenError,
     UserInResponse
 } from '../common/token'
-import { BookListItem, BookPanel, CategoryTabItem } from './Book/Panel'
+import { BookListItem, BookPanel } from './Book/Panel'
 import { RecommendPanel } from './Recommend/Panel'
 import { common } from '@kit.AbilityKit'
 import { UserPanel } from './User/Panel'
-import { MagazinePanel } from './Magazine/Panel'
+import { MagazineListItem, MagazinePanel } from './Magazine/Panel'
+import { CategoryTabItem } from './common/CategoryTab'
 
 @Entry
 @ComponentV2
@@ -35,6 +36,11 @@ struct Page {
     @Local bookPanelActiveCategoryIndex: number = 0
     @Local bookPanelCategories: CategoryTabItem[] = []
     @Local bookPanelBooks: BookListItem[] = []
+    // MagazinePanel
+    @Local magazinePanelNeedInit: boolean = true
+    @Local magazinePanelActiveCategoryIndex: number = 0
+    @Local magazinePanelCategories: CategoryTabItem[] = []
+    @Local magazinePanelItems: MagazineListItem[] = []
 
     aboutToAppear(): void {
         checkToken().then(async user => {
@@ -65,10 +71,17 @@ struct Page {
                 categories: this.bookPanelCategories,
                 changeNeedInit: value => this.bookPanelNeedInit = value,
                 changeActiveCategoryIndex: value => this.bookPanelActiveCategoryIndex = value,
-                books: this.bookPanelBooks,
+                items: this.bookPanelBooks,
             })
         } else if (this.activePageIndex == 2) {
-            MagazinePanel()
+            MagazinePanel({
+                needInit: this.magazinePanelNeedInit,
+                activeCategoryIndex: this.magazinePanelActiveCategoryIndex,
+                categories: this.magazinePanelCategories,
+                changeNeedInit: value => this.magazinePanelNeedInit = value,
+                changeActiveCategoryIndex: value => this.magazinePanelActiveCategoryIndex = value,
+                items: this.magazinePanelItems
+            })
         } else if (this.activePageIndex == 4) {
             UserPanel()
         }

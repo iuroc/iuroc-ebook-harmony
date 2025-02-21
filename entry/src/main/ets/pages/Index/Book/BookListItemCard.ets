@@ -2,7 +2,7 @@ import { ItemCard } from '../common/ItemCard'
 
 @ComponentV2
 export struct BookListItemCard {
-    @Require @Param bookId: number
+    @Require @Param itemId: number
     @Require @Param name: string
     @Require @Param author: string
     @Require @Param summary: string
@@ -12,7 +12,7 @@ export struct BookListItemCard {
 
     build() {
         ItemCard({
-            bookId: this.bookId,
+            itemId: this.itemId,
             name: this.name,
             author: this.author,
             summary: this.summary,

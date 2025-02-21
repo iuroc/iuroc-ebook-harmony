@@ -6,7 +6,7 @@ import { EbookType } from './mixin'
 @ComponentV2
 export struct ItemCard {
     @Require @Param type: EbookType
-    @Require @Param bookId: number
+    @Require @Param itemId: number
     @Require @Param name: string
     @Require @Param summary: string
     @Require @Param cover: string
@@ -33,7 +33,7 @@ export struct ItemCard {
                     .wordBreak(WordBreak.BREAK_ALL)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
                 Row({ space: 5 }) {
-                    Text(replaceChinesePunctuation(this.author))
+                    Text(replaceChinesePunctuation(this.type == 'book' ? this.author : `CN ${this.cn}`))
                         .wordBreak(WordBreak.BREAK_ALL)
                         .maxLines(1)
                         .fontColor(BSColor.info_text_emphasis)
@@ -43,7 +43,7 @@ export struct ItemCard {
                             maxWidth: '50%'
                         })
                     Divider().vertical(true).height(15)
-                    Text(replaceChinesePunctuation(this.publish))
+                    Text(replaceChinesePunctuation(this.type == 'book' ? this.publish : `ISSN ${this.issn}`))
                         .wordBreak(WordBreak.BREAK_ALL)
                         .maxLines(1)
                         .fontColor(BSColor.secondary_text_emphasis)
