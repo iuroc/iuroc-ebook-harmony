@@ -1,11 +1,12 @@
 import { BSColor } from '@iuroc/bootstrap5-color'
 import { apiOrigin } from '../../../common/config'
 import { replaceChinesePunctuation } from '../../../common/util'
+import { IssuePageParam } from '../../Issue/Page'
 import { EbookType } from '../common/mixin'
 
 @ComponentV2
 export struct ItemCard {
-    @Require @Param type: EbookType
+    @Require @Param type: EbookType | 'issue'
     @Require @Param itemId: number
     @Require @Param name: string
     @Require @Param summary: string
@@ -19,6 +20,7 @@ export struct ItemCard {
     @Param cn: string = ''
     /** 国际刊号 */
     @Param issn: string = ''
+    @Consumer() pathInfos: NavPathStack = new NavPathStack()
 
     build() {
         Row({ space: 10 }) {
@@ -84,6 +86,22 @@ export struct ItemCard {
             right: 15,
             top: 7.5,
             bottom: 7.5
+        })
+        .onClick(() => {
+            if (this.type == 'book') {
+
+            } else if (this.type == 'magazine') {
+                this.pathInfos.pushPath({
+                    name: 'Issue', param: {
+                        id: this.itemId,
+                        name: this.name,
+                        summary: this.summary,
+                        cover: this.cover,
+                        cn: this.cn,
+                        issn: this.issn
+                    } as IssuePageParam
+                })
+            }
         })
     }
 }
