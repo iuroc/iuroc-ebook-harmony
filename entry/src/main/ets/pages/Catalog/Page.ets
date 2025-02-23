@@ -1,5 +1,12 @@
-import { BookInfoInResponse, getInfo, InfoType, IssueInfoInResponse, } from './util'
-import { promptAction } from '@kit.ArkUI'
+import {
+    BookInfoInResponse,
+    CatalogInInfo,
+    CatalogObservedV2,
+    getInfo,
+    InfoType,
+    IssueInfoInResponse,
+} from './util'
+import { LengthMetrics, promptAction, SymbolGlyphModifier } from '@kit.ArkUI'
 import { Catalog } from '../Index/common/lib'
 import { MagazineListItem } from '../Index/panels/magazine/MagazinePanel'
 import { apiOrigin } from '../../common/config'
@@ -40,6 +47,7 @@ struct Page {
     @Local cover: string = ''
     @Local bookInfo?: BookInfoObservedV2
     @Local issueInfo?: IssueInfoInObservedV2
+    @Local catalogs: CatalogObservedV2[] = []
 
     aboutToAppear(): void {
         const param = this.queryNavDestinationInfo()?.param
@@ -62,79 +70,14 @@ struct Page {
     }
 
     build() {
-
         Scroll() {
-            Column() {
-                Row({ space: 15 }) {
-                    Column({ space: 10 }) {
-                        Text(this.type == 'book' ? this.bookInfo?.name : this.issueInfo?.magazine.name)
-                            .fontWeight(FontWeight.Bold)
-                            .width('100%')
-                            .maxLines(1)
-                            .textAlign(TextAlign.JUSTIFY)
-                            .wordBreak(WordBreak.BREAK_ALL)
-                            .textOverflow({ overflow: TextOverflow.Ellipsis })
-                        if (this.type == 'book') {
-                            FieldRow({
-                                label: '作者',
-                                content: this.bookInfo?.author,
-                                fontColor: BSColor.info_text_emphasis
-                            })
-                            FieldRow({
-                                label: '出版单位',
-                                content: this.bookInfo?.publish,
-                                fontColor: BSColor.success_text_emphasis
-                            })
-                            FieldRow({
-                                label: 'ISBN',
-                                content: this.bookInfo?.isbn,
-                                fontColor: BSColor.primary_text_emphasis
-                            })
-                        } else if (this.type == 'issue') {
-                            FieldRow({
-                                content: this.issueInfo?.name,
-                                fontColor: BSColor.info_text_emphasis
-                            })
-                            FieldRow({
-                                label: 'CN',
-                                content: this.issueInfo?.magazine.cn,
-                                fontColor: BSColor.success_text_emphasis
-                            })
-                            FieldRow({
-                                label: 'ISSN',
-                                content: this.issueInfo?.magazine.issn,
-                                fontColor: BSColor.primary_text_emphasis
-                            })
-                        }
-
-                        Row({ space: 10 }) {
-                            Button('开始阅读').layoutWeight(1)
-                            Button('添加收藏').backgroundColor(BSColor.warning).layoutWeight(1)
-                        }
-                        .width('100%')
-                    }
-                    .layoutWeight(1)
-
-                    Image(this.getCover(false))
-                        .height(150)
-                        .shadow(ShadowStyle.OUTER_DEFAULT_XS)
-                        .borderRadius(10)
-                        .onClick(() => {
-                            const imageURL = this.getCover(true)
-                            getPreviewFileUriForImageURL(imageURL).then(uri => {
-                                filePreview.openPreview(getContext(), {
-                                    uri,
-                                    title: '预览' + (this.type == 'book' ? '图书' : '期刊') + '封面',
-                                    mimeType: extToMime(extname(imageURL))[0]
-                                })
-                            })
-                        })
-                }
-                .alignItems(VerticalAlign.Center)
-                .width('100%')
-                .padding(15)
+            Column({ space: 15 }) {
+                this.NavCard()
+                this.Summary()
+                this.CatalogList()
             }
             .width('100%')
+            .padding({ top: 15, bottom: 15 })
         }
         .height('100%')
         .width('100%')
@@ -142,10 +85,168 @@ struct Page {
         .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
     }
 
+    @Builder
+    CatalogList() {
+        Row({ space: 5 }) {
+            SymbolGlyph($r('sys.symbol.list_bullet_circle'))
+                .fontColor([BSColor.primary_text_emphasis])
+            Text('目录')
+                .fontWeight(FontWeight.Bold)
+                .fontColor(BSColor.primary_text_emphasis)
+        }
+        .width('100%')
+        .padding({ left: 15, right: 15 })
+
+
+        Column() {
+            Column() {
+                ForEach(this.type == 'book' ? this.bookInfo?.catalogs : this.issueInfo?.catalogs,
+                    (catalog: CatalogInInfo, index) => {
+                        Row({ space: 10 }) {
+                            if (catalog.level > 0) {
+                                Divider().vertical(true).height(20).margin({ left: catalog.level * 20 })
+                                    .strokeWidth(2)
+                            }
+                            Text(catalog.title)
+                                .fontWeight(catalog.level == 0 ? FontWeight.Bold : FontWeight.Normal)
+                                .layoutWeight(1)
+                                .textAlign(TextAlign.JUSTIFY)
+                                .wordBreak(WordBreak.BREAK_ALL)
+                                .maxLines(1)
+                                .textOverflow({ overflow: TextOverflow.Ellipsis })
+                                .padding({ top: 10, bottom: 10 })
+                                .fontColor(catalog.level == 0 ? BSColor.secondary_text_emphasis : BSColor.secondary)
+                            // Text(catalog.page.toString()).fontColor(BSColor.secondary)
+                        }
+                        .stateStyles({
+                            pressed: {
+                                .backgroundColor(BSColor.secondary_bg_subtle)
+                            },
+                            normal: {
+                                .backgroundColor(Color.Transparent)
+                            }
+                        })
+                        .padding({ left: 15, right: 15 })
+                    })
+            }
+            .backgroundColor(BSColor.light)
+            .borderRadius(10)
+            .padding({ top: 10, bottom: 10 })
+        }
+        .width('100%')
+        .padding({ left: 5, right: 5 })
+    }
+
+    @Builder
+    Summary() {
+        Column() {
+            Column({ space: 10 }) {
+                Row({ space: 5 }) {
+                    SymbolGlyph($r('sys.symbol.info_circle')).fontSize(18).fontColor([BSColor.primary_text_emphasis])
+                    Text((this.type == 'book' ? '图书' : '期刊') + '内容简介')
+                        .fontWeight(FontWeight.Bold)
+                        .width('100%')
+                        .fontColor(BSColor.primary_text_emphasis)
+                }
+
+                Text(this.type == 'book' ? this.bookInfo?.summary : this.issueInfo?.magazine.summary)
+                    .wordBreak(WordBreak.BREAK_ALL)
+                    .textAlign(TextAlign.JUSTIFY)
+                    .width('100%')
+                    .fontWeight(FontWeight.Normal)
+                    .letterSpacing(1)
+                    .lineSpacing(LengthMetrics.vp(4))
+                    .fontSize(14)
+            }
+            .width('100%')
+            .padding(15)
+            .backgroundColor(BSColor.light)
+            .borderRadius(15)
+        }
+        .width('100%')
+        .padding({ left: 5, right: 5 })
+    }
+
     getCover(useBig: boolean) {
         return apiOrigin + (this.type == 'book'
             ? (useBig ? this.bookInfo?.bigCover : this.bookInfo?.cover)
             : this.issueInfo?.cover)
+    }
+
+    @Builder
+    NavCard() {
+        Row({ space: 15 }) {
+            Column({ space: 10 }) {
+                Text(this.type == 'book' ? this.bookInfo?.name : this.issueInfo?.magazine.name)
+                    .fontWeight(FontWeight.Bold)
+                    .width('100%')
+                    .maxLines(1)
+                    .textAlign(TextAlign.JUSTIFY)
+                    .wordBreak(WordBreak.BREAK_ALL)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                if (this.type == 'book') {
+                    FieldRow({
+                        label: '作者',
+                        content: this.bookInfo?.author,
+                        fontColor: BSColor.info_text_emphasis
+                    })
+                    FieldRow({
+                        label: '出版单位',
+                        content: this.bookInfo?.publish,
+                        fontColor: BSColor.success_text_emphasis
+                    })
+                    FieldRow({
+                        label: 'ISBN',
+                        content: this.bookInfo?.isbn,
+                        fontColor: BSColor.primary_text_emphasis
+                    })
+                } else if (this.type == 'issue') {
+                    FieldRow({
+                        content: this.issueInfo?.name,
+                        fontColor: BSColor.info_text_emphasis
+                    })
+                    FieldRow({
+                        label: 'CN',
+                        content: this.issueInfo?.magazine.cn,
+                        fontColor: BSColor.success_text_emphasis
+                    })
+                    FieldRow({
+                        label: 'ISSN',
+                        content: this.issueInfo?.magazine.issn,
+                        fontColor: BSColor.primary_text_emphasis
+                    })
+                }
+
+                Row({ space: 10 }) {
+                    Button('开始阅读').layoutWeight(1)
+                    Button('添加收藏').backgroundColor(BSColor.warning).layoutWeight(1)
+                }
+                .width('100%')
+            }
+            .layoutWeight(1)
+
+            Image(this.getCover(false))
+                .height(150)
+                .width(100 * 150 / 140)
+                .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+                .borderRadius(10)
+                .onClick(() => {
+                    const imageURL = this.getCover(true)
+                    getPreviewFileUriForImageURL(imageURL).then(uri => {
+                        filePreview.openPreview(getContext(), {
+                            uri,
+                            title: '预览' + (this.type == 'book' ? '图书' : '期刊') + '封面',
+                            mimeType: extToMime(extname(imageURL))[0]
+                        })
+                    })
+                })
+        }
+        .alignItems(VerticalAlign.Center)
+        .width('100%')
+        .padding({
+            left: 15,
+            right: 15
+        })
     }
 }
 
@@ -162,6 +263,16 @@ struct PageNav {
             })
         }
         .title(this.navTitle)
+        .menus([
+            {
+                value: '添加收藏',
+                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.star')),
+            },
+            {
+                value: '分享书刊',
+                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.share')),
+            }
+        ])
     }
 }
 
@@ -177,7 +288,7 @@ export interface CatalogPageParam {
 
 @ObservedV2
 export class BookInfoObservedV2 implements BookInfoInResponse {
-    @Trace catalogs: Catalog[]
+    @Trace catalogs: CatalogInInfo[]
     @Trace bigCover: string
     @Trace author: string
     @Trace publish: string
@@ -235,3 +346,5 @@ export class MagazineInfoObservedV2 implements MagazineListItem {
         this.cover = init.cover
     }
 }
+
+

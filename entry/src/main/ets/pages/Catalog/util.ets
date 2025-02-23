@@ -28,7 +28,7 @@ export async function getInfo<T extends IssueInfoInResponse | BookInfoInResponse
 }
 
 export interface BookInfoInResponse extends BookListItemInResponse {
-    catalogs: Catalog[]
+    catalogs: CatalogInInfo[]
 }
 
 export interface IssueInfoInResponse {
@@ -40,3 +40,25 @@ export interface IssueInfoInResponse {
 }
 
 export type InfoType = 'book' | 'issue'
+
+@ObservedV2
+export class CatalogObservedV2 {
+    @Trace page: number
+    @Trace title: string
+    @Trace level: number
+
+    constructor(page: number, title: string, level: number) {
+        this.page = page
+        this.title = title
+        this.level = level
+    }
+}
+
+export interface CatalogInInfo {
+    page: number
+    title: string
+    index: number
+    parentId: number
+    id: number
+    level: number
+}
