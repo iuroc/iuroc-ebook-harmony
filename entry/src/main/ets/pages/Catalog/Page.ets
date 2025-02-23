@@ -104,8 +104,10 @@ struct Page {
                     (catalog: CatalogInInfo, index) => {
                         Row({ space: 10 }) {
                             if (catalog.level > 0) {
-                                Divider().vertical(true).height(20).margin({ left: catalog.level * 20 })
-                                    .strokeWidth(2)
+                                Divider()
+                                    .vertical(true)
+                                    .height(30)
+                                    .margin({ left: catalog.level * 20 })
                             }
                             Text(catalog.title)
                                 .fontWeight(catalog.level == 0 ? FontWeight.Bold : FontWeight.Normal)
@@ -176,7 +178,7 @@ struct Page {
     @Builder
     NavCard() {
         Row({ space: 15 }) {
-            Column({ space: 10 }) {
+            Column({ space: 15 }) {
                 Text(this.type == 'book' ? this.bookInfo?.name : this.issueInfo?.magazine.name)
                     .fontWeight(FontWeight.Bold)
                     .width('100%')
@@ -184,37 +186,39 @@ struct Page {
                     .textAlign(TextAlign.JUSTIFY)
                     .wordBreak(WordBreak.BREAK_ALL)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
-                if (this.type == 'book') {
-                    FieldRow({
-                        label: '作者',
-                        content: this.bookInfo?.author,
-                        fontColor: BSColor.info_text_emphasis
-                    })
-                    FieldRow({
-                        label: '出版单位',
-                        content: this.bookInfo?.publish,
-                        fontColor: BSColor.success_text_emphasis
-                    })
-                    FieldRow({
-                        label: 'ISBN',
-                        content: this.bookInfo?.isbn,
-                        fontColor: BSColor.primary_text_emphasis
-                    })
-                } else if (this.type == 'issue') {
-                    FieldRow({
-                        content: this.issueInfo?.name,
-                        fontColor: BSColor.info_text_emphasis
-                    })
-                    FieldRow({
-                        label: 'CN',
-                        content: this.issueInfo?.magazine.cn,
-                        fontColor: BSColor.success_text_emphasis
-                    })
-                    FieldRow({
-                        label: 'ISSN',
-                        content: this.issueInfo?.magazine.issn,
-                        fontColor: BSColor.primary_text_emphasis
-                    })
+                Column({ space: 10 }) {
+                    if (this.type == 'book') {
+                        FieldRow({
+                            label: '作者',
+                            content: this.bookInfo?.author,
+                            fontColor: BSColor.info_text_emphasis
+                        })
+                        FieldRow({
+                            label: '出版单位',
+                            content: this.bookInfo?.publish,
+                            fontColor: BSColor.success_text_emphasis
+                        })
+                        FieldRow({
+                            label: 'ISBN',
+                            content: this.bookInfo?.isbn,
+                            fontColor: BSColor.primary_text_emphasis
+                        })
+                    } else if (this.type == 'issue') {
+                        FieldRow({
+                            content: this.issueInfo?.name,
+                            fontColor: BSColor.info_text_emphasis
+                        })
+                        FieldRow({
+                            label: 'CN',
+                            content: this.issueInfo?.magazine.cn,
+                            fontColor: BSColor.success_text_emphasis
+                        })
+                        FieldRow({
+                            label: 'ISSN',
+                            content: this.issueInfo?.magazine.issn,
+                            fontColor: BSColor.primary_text_emphasis
+                        })
+                    }
                 }
 
                 Row({ space: 10 }) {
@@ -226,7 +230,7 @@ struct Page {
             .layoutWeight(1)
 
             Image(this.getCover(false))
-                .height(150)
+                .height(160)
                 .width(100 * 150 / 140)
                 .shadow(ShadowStyle.OUTER_DEFAULT_XS)
                 .borderRadius(10)
