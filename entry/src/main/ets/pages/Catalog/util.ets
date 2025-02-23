@@ -5,7 +5,7 @@ import { Catalog } from '../Index/common/lib'
 import { ApiResponse, BookListItemInResponse } from '../Index/common/mixin'
 import { MagazineListItem } from '../Index/panels/magazine/MagazinePanel'
 
-export async function getInfo<T extends MagazineInfoInResponse | BookInfoInResponse>(itemId: number, type: InfoType) {
+export async function getInfo<T extends IssueInfoInResponse | BookInfoInResponse>(itemId: number, type: InfoType) {
     const request = http.createHttp()
     const _url = apiOrigin + (type == 'book' ? '/api/ebook/book/info' : '/api/ebook/magazine/issueInfo')
     const response = await request.request(_url, {
@@ -31,7 +31,7 @@ export interface BookInfoInResponse extends BookListItemInResponse {
     catalogs: Catalog[]
 }
 
-export interface MagazineInfoInResponse {
+export interface IssueInfoInResponse {
     id: number
     name: string
     cover: string

@@ -81,4 +81,5 @@ export interface BookListItem extends CommonListItem {
     author: string
     /** 出版社名称 */
     publish: string
+    isbn: string
 }
