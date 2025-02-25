@@ -19,7 +19,7 @@ struct Page {
     @Local activePageIndex: number = 1
     // Navigation
     @Provider() pathInfos: NavPathStack = new NavPathStack()
-    private titles = ['精彩推荐', '图书列表', '期刊列表', '实用工具', '个人中心']
+    private titles = ['我的书架', '图书列表', '期刊列表', '实用工具', '个人中心']
     private titleModes: NavigationTitleMode[] = [
         NavigationTitleMode.Mini,
         NavigationTitleMode.Mini,
@@ -118,9 +118,9 @@ struct Page {
     toolbarItems(): ToolbarItem[] {
         return [
             {
-                value: '推荐',
-                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.label')),
-                activeSymbolIcon: new SymbolGlyphModifier($r('sys.symbol.label')),
+                value: '书架',
+                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.list_square')),
+                activeSymbolIcon: new SymbolGlyphModifier($r('sys.symbol.list_square')),
             },
             {
                 value: '图书',

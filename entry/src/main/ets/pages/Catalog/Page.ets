@@ -48,6 +48,12 @@ struct Page {
     @Local bookInfo?: BookInfoObservedV2
     @Local issueInfo?: IssueInfoInObservedV2
     @Local catalogs: CatalogObservedV2[] = []
+    /** 是否显示继续阅读 */
+    @Local continueRead: boolean = true
+    /**
+     * 是否已在书架
+     */
+    @Local isInBookShelf: boolean | null = null
 
     aboutToAppear(): void {
         const param = this.queryNavDestinationInfo()?.param
@@ -63,6 +69,8 @@ struct Page {
                     this.issueInfo = new IssueInfoInObservedV2(result as IssueInfoInResponse)
                     this.changeNavTitle('期刊详情')
                 }
+                // 后期需要往响应里面，加入一个字段，表示是否在书架，也可以单独一个接口查询是否在书架
+                this.isInBookShelf = true
             }).catch((error: Error) => {
                 promptAction.showToast(error)
             })
@@ -221,9 +229,19 @@ struct Page {
                     }
                 }
 
-                Row({ space: 10 }) {
+                Row({ space: 5 }) {
                     Button('开始阅读').layoutWeight(1)
-                    Button('添加收藏').backgroundColor(BSColor.warning).layoutWeight(1)
+                    if (this.isInBookShelf != null) {
+                        Button(this.isInBookShelf ? '已在书架' : '加到书架')
+                            .backgroundColor(this.isInBookShelf ? BSColor.success_bg_subtle :
+                            BSColor.secondary_bg_subtle)
+                            .fontColor(this.isInBookShelf ? BSColor.success_text_emphasis :
+                            BSColor.secondary_text_emphasis)
+                            .layoutWeight(1)
+                            .onClick(() => {
+                                this.isInBookShelf = !this.isInBookShelf
+                            })
+                    }
                 }
                 .width('100%')
             }
@@ -263,15 +281,11 @@ struct PageNav {
             Page({
                 changeNavTitle: title => {
                     this.navTitle = title
-                }
+                },
             })
         }
         .title(this.navTitle)
         .menus([
-            {
-                value: '添加收藏',
-                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.star')),
-            },
             {
                 value: '分享书刊',
                 symbolIcon: new SymbolGlyphModifier($r('sys.symbol.share')),
