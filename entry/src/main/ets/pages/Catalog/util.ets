@@ -137,3 +137,4 @@ export interface ReadHistoryInResponse {
     userId: number
     updateAt: string
 }
+

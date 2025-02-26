@@ -161,6 +161,7 @@ struct Page {
                         .padding({ left: 15, right: 15 })
                         .onClick(() => {
                             this.currentBookPage = catalog.page
+                            this.gotoContentPage()
                         })
                     })
             }
@@ -258,13 +259,7 @@ struct Page {
                     Button('开始阅读').layoutWeight(1)
                         .enabled(this.currentBookPage != null)
                         .onClick(() => {
-                            this.pathInfos.pushPath({
-                                name: 'Content', param: {
-                                    type: this.type,
-                                    itemId: this.itemId,
-                                    currentBookPage: this.currentBookPage
-                                } as ContentPageParam
-                            })
+                            this.gotoContentPage()
                         })
                     Button(this.isInBookShelf ? '已在书架' : '加到书架')
                         .enabled(this.isInBookShelf != null)
@@ -309,6 +304,17 @@ struct Page {
         .padding({
             left: 15,
             right: 15
+        })
+    }
+
+    /** 请先修改 `this.currentBookPage`，然后调用本方法，跳转到阅读页面 */
+    gotoContentPage() {
+        this.pathInfos.pushPath({
+            name: 'Content', param: {
+                type: this.type,
+                itemId: this.itemId,
+                currentBookPage: this.currentBookPage,
+            } as ContentPageParam
         })
     }
 }
