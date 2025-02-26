@@ -14,6 +14,11 @@
             "name": "Catalog",
             "pageSourceFile": "src/main/ets/pages/Catalog/Page.ets",
             "buildFunction": "PageBuilder"
+        },
+        {
+            "name": "Content",
+            "pageSourceFile": "src/main/ets/pages/Content/Page.ets",
+            "buildFunction": "PageBuilder"
         }
     ]
 }

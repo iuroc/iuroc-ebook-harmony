@@ -3,6 +3,7 @@ import {
     CatalogInInfo,
     CatalogObservedV2,
     getInfo,
+    getOneBookShelf,
     InfoType,
     IssueInfoInResponse,
 } from './util'
@@ -13,6 +14,7 @@ import { apiOrigin } from '../../common/config'
 import { BSColor } from '@iuroc/bootstrap5-color'
 import { extname, extToMime, getPreviewFileUriForImageURL, replaceChinesePunctuation } from '../../common/util'
 import { filePreview } from '@kit.PreviewKit'
+import { ContentPageParam } from '../Content/Page'
 
 @ComponentV2
 struct FieldRow {
@@ -42,7 +44,13 @@ struct FieldRow {
 @ComponentV2
 struct Page {
     @Event changeNavTitle: (title: string) => void
+    /**
+     * Book 或 Issue 的 ID
+     */
     @Local itemId?: number
+    /**
+     * 数据类型，Book 或 Issue
+     */
     @Local type?: InfoType
     @Local cover: string = ''
     @Local bookInfo?: BookInfoObservedV2
@@ -50,6 +58,7 @@ struct Page {
     @Local catalogs: CatalogObservedV2[] = []
     /** 是否显示继续阅读 */
     @Local continueRead: boolean = true
+    @Consumer() pathInfos: NavPathStack = new NavPathStack()
     /**
      * 是否已在书架
      */
@@ -60,18 +69,24 @@ struct Page {
         if (param) {
             this.itemId = (param as CatalogPageParam).itemId
             this.type = (param as CatalogPageParam).type
-
-            getInfo(this.itemId as number, this.type as InfoType).then(result => {
-                if (this.type == 'book') {
-                    this.bookInfo = new BookInfoObservedV2(result as BookInfoInResponse)
-                    this.changeNavTitle('图书详情')
-                } else if (this.type == 'issue') {
-                    this.issueInfo = new IssueInfoInObservedV2(result as IssueInfoInResponse)
-                    this.changeNavTitle('期刊详情')
-                }
-                // 后期需要往响应里面，加入一个字段，表示是否在书架，也可以单独一个接口查询是否在书架
-                this.isInBookShelf = true
-            }).catch((error: Error) => {
+            Promise.all([
+            // 加载书刊信息
+                getInfo(this.itemId as number, this.type as InfoType).then(result => {
+                    if (this.type == 'book') {
+                        this.bookInfo = new BookInfoObservedV2(result as BookInfoInResponse)
+                        this.changeNavTitle('图书详情')
+                    } else if (this.type == 'issue') {
+                        this.issueInfo = new IssueInfoInObservedV2(result as IssueInfoInResponse)
+                        this.changeNavTitle('期刊详情')
+                    }
+                }),
+                // 判断是否在书架中
+                getOneBookShelf(this.itemId as number, this.type as InfoType).then(result => {
+                    this.isInBookShelf = true
+                }).catch((_error: Error) => {
+                    this.isInBookShelf = false
+                })
+            ]).catch((error: Error) => {
                 promptAction.showToast(error)
             })
         }
@@ -231,17 +246,24 @@ struct Page {
 
                 Row({ space: 5 }) {
                     Button('开始阅读').layoutWeight(1)
-                    if (this.isInBookShelf != null) {
-                        Button(this.isInBookShelf ? '已在书架' : '加到书架')
-                            .backgroundColor(this.isInBookShelf ? BSColor.success_bg_subtle :
-                            BSColor.secondary_bg_subtle)
-                            .fontColor(this.isInBookShelf ? BSColor.success_text_emphasis :
-                            BSColor.secondary_text_emphasis)
-                            .layoutWeight(1)
-                            .onClick(() => {
-                                this.isInBookShelf = !this.isInBookShelf
+                        .onClick(() => {
+                            this.pathInfos.pushPath({
+                                name: 'Content', param: {
+                                    type: this.type,
+                                    itemId: this.itemId
+                                } as ContentPageParam
                             })
-                    }
+                        })
+                    Button(this.isInBookShelf ? '已在书架' : '加到书架')
+                        .enabled(this.isInBookShelf != null)
+                        .backgroundColor(this.isInBookShelf ? BSColor.success_bg_subtle :
+                        BSColor.secondary_bg_subtle)
+                        .fontColor(this.isInBookShelf ? BSColor.success_text_emphasis :
+                        BSColor.secondary_text_emphasis)
+                        .layoutWeight(1)
+                        .onClick(() => {
+                            this.isInBookShelf = !this.isInBookShelf
+                        })
                 }
                 .width('100%')
             }

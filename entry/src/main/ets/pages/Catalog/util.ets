@@ -62,3 +62,26 @@ export interface CatalogInInfo {
     id: number
     level: number
 }
+
+export async function getOneBookShelf(itemId: number, type: InfoType) {
+    const request = http.createHttp()
+    const response = await request.request(apiOrigin + '/api/ebook/bookShelf/get', {
+        method: http.RequestMethod.POST,
+        header: { token: await getToken() },
+        extraData: JSON.stringify({ itemId, type }),
+        expectDataType: http.HttpDataType.OBJECT
+    })
+    const result = response.result as ApiResponse<BookShelfInResponse>
+    if (!result.success) {
+        throw new Error(result.message)
+    }
+    return result.data
+}
+
+export interface BookShelfInResponse {
+    id: number
+    itemId: number
+    type: InfoType
+    userId: number
+    createAt: string
+}
