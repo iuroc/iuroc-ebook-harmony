@@ -31,11 +31,14 @@ export interface BookInfoInResponse extends BookListItemInResponse {
     catalogs: CatalogInInfo[]
 }
 
-export interface IssueInfoInResponse {
+export interface IssueInfoNoCatalogsInResponse {
     id: number
     name: string
     cover: string
     magazine: MagazineListItem
+}
+
+export interface IssueInfoInResponse extends IssueInfoNoCatalogsInResponse {
     catalogs: Catalog[]
 }
 
@@ -73,7 +76,7 @@ export async function getOneBookShelf(itemId: number, type: InfoType) {
     })
     const result = response.result as ApiResponse<BookShelfInResponse>
     if (!result.success) {
-        throw new Error(result.message)
+        return false
     }
     return result.data
 }
@@ -108,4 +111,29 @@ export interface BookShelfToggleResultInResponse {
 export interface BookShelfAddResultInResponse extends BookShelfToggleResultInResponse {
     id: number
     createAt: string
+}
+
+export async function getOneReadHistory(itemId: number, type: InfoType) {
+    const request = http.createHttp()
+    const response = await request.request(apiOrigin + '/api/ebook/history/get', {
+        method: http.RequestMethod.POST,
+        header: { token: await getToken() },
+        extraData: JSON.stringify({ itemId, type }),
+        expectDataType: http.HttpDataType.OBJECT
+    })
+    const result = response.result as ApiResponse<ReadHistoryInResponse>
+    if (!result.success) {
+        return false
+    }
+    return result.data
+}
+
+export interface ReadHistoryInResponse {
+    id: number
+    itemId: number
+    type: InfoType
+    currentBookPage: number
+    createAt: string
+    userId: number
+    updateAt: string
 }

@@ -4,6 +4,7 @@ import {
     CatalogObservedV2,
     getInfo,
     getOneBookShelf,
+    getOneReadHistory,
     InfoType,
     IssueInfoInResponse,
     toggleBookShelf,
@@ -56,7 +57,6 @@ struct Page {
     @Local cover: string = ''
     @Local bookInfo?: BookInfoObservedV2
     @Local issueInfo?: IssueInfoInObservedV2
-    @Local catalogs: CatalogObservedV2[] = []
     /** 是否显示继续阅读 */
     @Local continueRead: boolean = true
     @Consumer() pathInfos: NavPathStack = new NavPathStack()
@@ -64,6 +64,8 @@ struct Page {
      * 是否已在书架
      */
     @Local isInBookShelf: boolean | null = null
+    /** 当前读到第几页了 */
+    @Local currentBookPage: number | null = null
 
     aboutToAppear(): void {
         const param = this.queryNavDestinationInfo()?.param
@@ -83,9 +85,11 @@ struct Page {
                 }),
                 // 判断是否在书架中
                 getOneBookShelf(this.itemId as number, this.type as InfoType).then(result => {
-                    this.isInBookShelf = true
-                }).catch((_error: Error) => {
-                    this.isInBookShelf = false
+                    this.isInBookShelf = !!result
+                }),
+                // 获取当前阅读进度，用于在目录中高亮显示
+                getOneReadHistory(this.itemId as number, this.type as InfoType).then(result => {
+                    this.currentBookPage = result && result.currentBookPage || 1
                 })
             ]).catch((error: Error) => {
                 promptAction.showToast(error)
@@ -133,16 +137,18 @@ struct Page {
                                     .height(30)
                                     .margin({ left: catalog.level * 20 })
                             }
-                            Text(catalog.title)
-                                .fontWeight(catalog.level == 0 ? FontWeight.Bold : FontWeight.Normal)
-                                .layoutWeight(1)
-                                .textAlign(TextAlign.JUSTIFY)
-                                .wordBreak(WordBreak.BREAK_ALL)
-                                .maxLines(1)
-                                .textOverflow({ overflow: TextOverflow.Ellipsis })
-                                .padding({ top: 10, bottom: 10 })
-                                .fontColor(catalog.level == 0 ? BSColor.secondary_text_emphasis : BSColor.secondary)
-                            // Text(catalog.page.toString()).fontColor(BSColor.secondary)
+                            Column({ space: 5 }) {
+                                Text(catalog.title)
+                                    .fontWeight(catalog.level == 0 ? FontWeight.Bold : FontWeight.Normal)
+                                    .textAlign(TextAlign.JUSTIFY)
+                                    .wordBreak(WordBreak.BREAK_ALL)
+                                    .maxLines(1)
+                                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                                    .fontColor(catalog.level == 0 ? BSColor.secondary_text_emphasis : BSColor.secondary)
+                                    .width('100%')
+                            }
+                            .layoutWeight(1)
+                            .padding({ top: 10, bottom: 10 })
                         }
                         .stateStyles({
                             pressed: {
@@ -153,6 +159,9 @@ struct Page {
                             }
                         })
                         .padding({ left: 15, right: 15 })
+                        .onClick(() => {
+                            this.currentBookPage = catalog.page
+                        })
                     })
             }
             .backgroundColor(BSColor.light)
@@ -247,11 +256,13 @@ struct Page {
 
                 Row({ space: 5 }) {
                     Button('开始阅读').layoutWeight(1)
+                        .enabled(this.currentBookPage != null)
                         .onClick(() => {
                             this.pathInfos.pushPath({
                                 name: 'Content', param: {
                                     type: this.type,
-                                    itemId: this.itemId
+                                    itemId: this.itemId,
+                                    currentBookPage: this.currentBookPage
                                 } as ContentPageParam
                             })
                         })
@@ -265,6 +276,7 @@ struct Page {
                         )
                         .layoutWeight(1)
                         .onClick(() => {
+                            this.isInBookShelf = null
                             toggleBookShelf(this.itemId as number, this.type as InfoType).then(result => {
                                 this.isInBookShelf = result.isInBookShelf
                             }).catch((error: Error) => {
