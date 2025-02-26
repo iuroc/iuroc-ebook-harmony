@@ -78,10 +78,34 @@ export async function getOneBookShelf(itemId: number, type: InfoType) {
     return result.data
 }
 
+export async function toggleBookShelf(itemId: number, type: InfoType) {
+    const request = http.createHttp()
+    const response = await request.request(apiOrigin + '/api/ebook/bookShelf/toggle', {
+        method: http.RequestMethod.POST,
+        header: { token: await getToken() },
+        extraData: JSON.stringify({ itemId, type }),
+        expectDataType: http.HttpDataType.OBJECT
+    })
+    const result = response.result as ApiResponse<BookShelfToggleResultInResponse>
+    if (!result.success) {
+        throw new Error(result.message)
+    }
+    return result.data
+}
+
 export interface BookShelfInResponse {
     id: number
     itemId: number
     type: InfoType
     userId: number
+    createAt: string
+}
+
+export interface BookShelfToggleResultInResponse {
+    isInBookShelf: boolean
+}
+
+export interface BookShelfAddResultInResponse extends BookShelfToggleResultInResponse {
+    id: number
     createAt: string
 }

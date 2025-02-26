@@ -6,6 +6,7 @@ import {
     getOneBookShelf,
     InfoType,
     IssueInfoInResponse,
+    toggleBookShelf,
 } from './util'
 import { LengthMetrics, promptAction, SymbolGlyphModifier } from '@kit.ArkUI'
 import { Catalog } from '../Index/common/lib'
@@ -256,13 +257,19 @@ struct Page {
                         })
                     Button(this.isInBookShelf ? '已在书架' : '加到书架')
                         .enabled(this.isInBookShelf != null)
-                        .backgroundColor(this.isInBookShelf ? BSColor.success_bg_subtle :
-                        BSColor.secondary_bg_subtle)
-                        .fontColor(this.isInBookShelf ? BSColor.success_text_emphasis :
-                        BSColor.secondary_text_emphasis)
+                        .backgroundColor(
+                            this.isInBookShelf ? BSColor.success_bg_subtle : BSColor.secondary_bg_subtle
+                        )
+                        .fontColor(
+                            this.isInBookShelf ? BSColor.success_text_emphasis : BSColor.secondary_text_emphasis
+                        )
                         .layoutWeight(1)
                         .onClick(() => {
-                            this.isInBookShelf = !this.isInBookShelf
+                            toggleBookShelf(this.itemId as number, this.type as InfoType).then(result => {
+                                this.isInBookShelf = result.isInBookShelf
+                            }).catch((error: Error) => {
+                                promptAction.showToast(error)
+                            })
                         })
                 }
                 .width('100%')
