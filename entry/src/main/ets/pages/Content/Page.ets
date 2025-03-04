@@ -1,4 +1,4 @@
-import { promptAction } from "@kit.ArkUI"
+import { promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
 import { Content } from '../Index/common/lib'
 import { getContentAndCatalog, getInfoOnly, makePageHTML } from "./util"
 import { webview } from "@kit.ArkWeb"
@@ -7,6 +7,7 @@ import { CatalogInInfo, InfoType } from "../Catalog/util"
 import { BSColor } from "@iuroc/bootstrap5-color"
 import { pasteboard } from "@kit.BasicServicesKit"
 import { WebComponent } from "./Test"
+import { WebReadBox } from "./WebReadBox"
 
 @ComponentV2
 struct Page {
@@ -23,7 +24,7 @@ struct Page {
      */
     contentMap: Map<number, Content> = new Map()
     /** 目录缓存，只写入一次，后续只要数组不为空就不再写入 */
-    catalogs: CatalogInInfo[] = []
+    @Local catalogs: CatalogInInfo[] = []
     private bookPageCount = 30
     /** 当前正文缓存中的最大页码，每次写入正文缓存，都会更新该值
      *
@@ -35,7 +36,6 @@ struct Page {
      * 同时，每次写入正文缓存，都会更新 maxBookPage，当 currentBookPage 等于 maxBookPage 时，也会禁用下一页按钮。
      */
     @Local noMore: boolean = false
-    @Local showBottomPanel: boolean = false
 
     aboutToAppear(): void {
         const param = this.queryNavDestinationInfo()?.param as ContentPageParam | undefined
@@ -107,49 +107,36 @@ struct Page {
     build() {
         RelativeContainer() {
             WebReadBox({
-                showBottomPanel: this.showBottomPanel,
                 webController: this.webController,
-                changeShowBottomPanel: value => this.showBottomPanel = value,
             }).height('100%')
-            this.BottomPanel2()
+            this.BottomPanel()
         }
         .width('100%')
         .height('100%')
     }
 
     @Builder
-    BottomPanel2() {
+    BottomPanel() {
         Row({ space: 5 }) {
             Button('上一页')
                 .buttonStyle(ButtonStyleMode.NORMAL)
                 .fontColor(BSColor.dark)
                 .fontSize(15)
-                .padding({
-                    top: 5,
-                    bottom: 5,
-                    left: 10,
-                    right: 10
-                })
-                .height('auto')
                 .enabled(this.currentBookPage > 1)
                 .onClick(() => {
                     this.changeToPage(--this.currentBookPage)
                 })
+                .smButton()
+            Text(`${this.currentBookPage}/${Math.max(this.catalogs.slice(-1)[0]?.page || 0, this.maxPageNum)}`)
             Button('下一页')
                 .buttonStyle(ButtonStyleMode.NORMAL)
                 .fontColor(BSColor.dark)
                 .fontSize(15)
-                .padding({
-                    top: 5,
-                    bottom: 5,
-                    left: 10,
-                    right: 10
-                })
-                .height('auto')
                 .enabled(!this.noMore || this.currentBookPage != this.maxPageNum)
                 .onClick(() => {
                     this.changeToPage(++this.currentBookPage)
                 })
+                .smButton()
         }
         .backgroundColor(Color.White)
         .shadow(ShadowStyle.OUTER_DEFAULT_XS)
@@ -168,65 +155,18 @@ struct Page {
         })
     }
 
-    @Builder
-    BottomPanel() {
-        if (this.showBottomPanel)
-        Row({ space: 10 }) {
-            Button('上一页').layoutWeight(1).buttonStyle(ButtonStyleMode.NORMAL)
-                .onClick(() => {
-                    this.changeToPage(--this.currentBookPage)
-                })
-                .enabled(this.currentBookPage > 1)
-            Button('下一页').layoutWeight(1).buttonStyle(ButtonStyleMode.NORMAL)
-                .onClick(() => {
-                    this.changeToPage(++this.currentBookPage)
-                })
-                .enabled(!this.noMore || this.currentBookPage != this.maxPageNum)
-        }
-        .width('100%')
-        .id('bottomPanel')
-        .alignRules({
-            bottom: {
-                anchor: '__container__',
-                align: VerticalAlign.Bottom
-            }
+    @Styles
+    smButton() {
+        .padding({
+            top: 5,
+            bottom: 5,
+            left: 10,
+            right: 10
         })
-        .backgroundColor(BSColor.white)
-        .padding(15)
+        .height('auto')
     }
 }
 
-@ComponentV2
-struct WebReadBox {
-    @Require @Param webController: webview.WebviewController
-    touchTargetIsHide: boolean = false
-    @Require @Param showBottomPanel: boolean
-    @Event changeShowBottomPanel: (value: boolean) => void
-
-    build() {
-        Web({ src: '', controller: this.webController })
-            .width('100%')
-            .onTouch(event => {
-                // if (event.type == TouchType.Down) {
-                //     this.touchTargetIsHide = this.showBottomPanel
-                //     this.changeShowBottomPanel(false)
-                // } else if (event.type == TouchType.Up && !this.touchTargetIsHide) {
-                //     this.changeShowBottomPanel(true)
-                // } else if (event.type == TouchType.Move) {
-                //     this.touchTargetIsHide = true
-                // }
-            })
-    }
-
-    @Builder
-    Menu() {
-        Menu() {
-            MenuItem() {
-                Text('操作')
-            }
-        }
-    }
-}
 
 @ComponentV2
 struct PageNav {
@@ -242,6 +182,51 @@ struct PageNav {
             })
         }
         .title(this.navTitle)
+        .menus([
+            {
+                value: '目录',
+                action: () => {
+
+                },
+                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.list_square'))
+            },
+            {
+                value: '添加书签',
+                action: () => {
+
+                },
+                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.bookmark'))
+            },
+            {
+                value: '书刊详情',
+                action: () => {
+
+                },
+                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.AI_circle_viewfinder'))
+            },
+            {
+                value: '书签列表',
+                action: () => {
+
+                },
+                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.bookmark'))
+            },
+            {
+                value: '阅读设置',
+                action: () => {
+
+                },
+                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.gearshape'))
+            },
+            {
+                // 统计一些字段的值，比如当前的行间距，字号，背景颜色，历史阅读记录，当前页码，总页码等
+                value: '统计信息',
+                action: () => {
+
+                },
+                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.info_circle'))
+            }
+        ])
     }
 }
 
