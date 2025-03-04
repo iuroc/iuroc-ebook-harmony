@@ -96,12 +96,15 @@ export function makePageHTML(content: string) {
 
             body {
                 margin: 0;
+                letter-spacing: 1px;
+                line-height: 1.5;
+                text-align: justify;
             }
         </style>
     </head>
 
     <body>
-        <div style="padding: 15px 15px 70px;">
+        <div style="padding: 0 15px 70px;">
             ${content}
         </div>
     </body>

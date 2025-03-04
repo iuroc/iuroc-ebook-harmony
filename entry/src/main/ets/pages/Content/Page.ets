@@ -5,6 +5,8 @@ import { webview } from "@kit.ArkWeb"
 import { apiOrigin } from "../../common/config"
 import { CatalogInInfo, InfoType } from "../Catalog/util"
 import { BSColor } from "@iuroc/bootstrap5-color"
+import { pasteboard } from "@kit.BasicServicesKit"
+import { WebComponent } from "./Test"
 
 @ComponentV2
 struct Page {
@@ -14,11 +16,24 @@ struct Page {
     @Local itemId: number | null = null
     @Local currentBookPage: number = 1
     @Consumer() pathInfos: NavPathStack = new NavPathStack()
-    /** BookPage 和对应 Content 的映射 */
+    webController = new webview.WebviewController()
+    /** BookPage 和对应 Content 的映射
+     *
+     * 正文缓存，如果指定页码的正文存在，则读取缓存，否则就要请求后端返回正文，并存入缓存
+     */
     contentMap: Map<number, Content> = new Map()
+    /** 目录缓存，只写入一次，后续只要数组不为空就不再写入 */
     catalogs: CatalogInInfo[] = []
     private bookPageCount = 30
+    /** 当前正文缓存中的最大页码，每次写入正文缓存，都会更新该值
+     *
+     * 该值不等于正文 Map 的项目数量，因为正文 Map 初始只是存储了请求页码周期的内容数据
+     */
     @Local maxPageNum: number = 0
+    /** 该值一旦为 true，则下一页按钮禁用
+     *
+     * 同时，每次写入正文缓存，都会更新 maxBookPage，当 currentBookPage 等于 maxBookPage 时，也会禁用下一页按钮。
+     */
     @Local noMore: boolean = false
     @Local showBottomPanel: boolean = false
 
@@ -39,6 +54,7 @@ struct Page {
 
     /**
      * 载入指定页码的正文，会自动请求后端数据和处理缓存
+     *
      * @param page
      */
     async changeToPage(page: number) {
@@ -58,55 +74,98 @@ struct Page {
             // 将获取到的正文写入缓存
             result.contents.forEach(content => {
                 this.contentMap.set(content.index + 1, content)
-                // 更新最大页码
+                // 更新当前正文缓存中的最大页码
                 this.maxPageNum = Math.max(this.maxPageNum, content.index + 1)
             })
+            // 比如设置一次返回 30 页，但是返回的却少于 30 页，这说明已经没有更多页面了，亦或者返回的为空数组，说明上一次获取已经就到底了，这一次也标记为到底了
             if (result.contents.length < this.bookPageCount || result.contents.length == 0) {
                 this.noMore = true
             }
         }
+        // 比如当前章节的起始页码是 A，那么只要处于当前章节内部，都满足 A <= currentPage，可是上一章节的起始页码 B，也满足 B <= A <= currentPage
+        // 所以。取 <= currentPage 的章节的最后一个项目，就是当前的章节。
         this.changeNavTitle(this.catalogs.filter(item => item.page <= this.currentBookPage).slice(-1)[0].title)
+        // 将翻页的目标正文载入到 Web 容器
         this.webController.loadData(
             makePageHTML(this.contentMap.get(this.currentBookPage)!.content),
             'text/html', 'utf-8', apiOrigin
         )
     }
 
+    /**
+     * 根据当前的 bookPage，获取当前的页码周期起始 bookPage
+     *
+     * - 例如，每次返回 30 页，那么 currentBookPage 为 1-30，startBookPage 都应该是 1
+     * - 例如，每次返回 30 页，那么 currentBookPage 为 31-60，startBookPage 都是 31
+     * @param currentBookPage
+     * @returns
+     */
     getStartBookPageByCurrentBookPage(currentBookPage: number) {
         return Math.floor((currentBookPage - 1) / this.bookPageCount) * this.bookPageCount + 1
     }
 
-    webController = new webview.WebviewController()
-
     build() {
         RelativeContainer() {
-            Scroll() {
-                Column() {
-                    Web({
-                        src: '',
-                        controller: this.webController
-                    })
-                        .width('100%')
-                        .onClick(() => {
-                            this.showBottomPanel = !this.showBottomPanel
-                        })
-                        .onScroll(() => {
-                            if (this.showBottomPanel) {
-                                this.showBottomPanel = false
-                            }
-                        })
-                }
-                .width('100%')
-            }
-            .width('100%')
-            .height('100%')
-            .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
-            .align(Alignment.Top)
-
-            this.BottomPanel()
+            WebReadBox({
+                showBottomPanel: this.showBottomPanel,
+                webController: this.webController,
+                changeShowBottomPanel: value => this.showBottomPanel = value,
+            }).height('100%')
+            this.BottomPanel2()
         }
         .width('100%')
         .height('100%')
+    }
+
+    @Builder
+    BottomPanel2() {
+        Row({ space: 5 }) {
+            Button('上一页')
+                .buttonStyle(ButtonStyleMode.NORMAL)
+                .fontColor(BSColor.dark)
+                .fontSize(15)
+                .padding({
+                    top: 5,
+                    bottom: 5,
+                    left: 10,
+                    right: 10
+                })
+                .height('auto')
+                .enabled(this.currentBookPage > 1)
+                .onClick(() => {
+                    this.changeToPage(--this.currentBookPage)
+                })
+            Button('下一页')
+                .buttonStyle(ButtonStyleMode.NORMAL)
+                .fontColor(BSColor.dark)
+                .fontSize(15)
+                .padding({
+                    top: 5,
+                    bottom: 5,
+                    left: 10,
+                    right: 10
+                })
+                .height('auto')
+                .enabled(!this.noMore || this.currentBookPage != this.maxPageNum)
+                .onClick(() => {
+                    this.changeToPage(++this.currentBookPage)
+                })
+        }
+        .backgroundColor(Color.White)
+        .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+        .borderRadius('50%')
+        .padding(5)
+        .margin(20)
+        .alignRules({
+            bottom: {
+                anchor: '__container__',
+                align: VerticalAlign.Bottom,
+            },
+            right: {
+                anchor: '__container__',
+                align: HorizontalAlign.End
+            }
+        })
     }
 
     @Builder
@@ -134,6 +193,38 @@ struct Page {
         })
         .backgroundColor(BSColor.white)
         .padding(15)
+    }
+}
+
+@ComponentV2
+struct WebReadBox {
+    @Require @Param webController: webview.WebviewController
+    touchTargetIsHide: boolean = false
+    @Require @Param showBottomPanel: boolean
+    @Event changeShowBottomPanel: (value: boolean) => void
+
+    build() {
+        Web({ src: '', controller: this.webController })
+            .width('100%')
+            .onTouch(event => {
+                // if (event.type == TouchType.Down) {
+                //     this.touchTargetIsHide = this.showBottomPanel
+                //     this.changeShowBottomPanel(false)
+                // } else if (event.type == TouchType.Up && !this.touchTargetIsHide) {
+                //     this.changeShowBottomPanel(true)
+                // } else if (event.type == TouchType.Move) {
+                //     this.touchTargetIsHide = true
+                // }
+            })
+    }
+
+    @Builder
+    Menu() {
+        Menu() {
+            MenuItem() {
+                Text('操作')
+            }
+        }
     }
 }
 
