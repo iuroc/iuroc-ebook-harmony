@@ -1,49 +1,43 @@
 import { promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
 import { Content } from '../Index/common/lib'
-import { getCatalogTitleByBookPage, getContentAndCatalog, getInfoOnly, makePageHTML, updateReadHistory } from "./util"
+import { getCatalogTitleByBookPage, getContentAndCatalog, makePageHTML, updateReadHistory } from "./util"
 import { webview } from "@kit.ArkWeb"
 import { apiOrigin } from "../../common/config"
 import { CatalogInInfo, InfoType } from "../Catalog/util"
 import { BSColor } from "@iuroc/bootstrap5-color"
-import { pasteboard } from "@kit.BasicServicesKit"
-import { WebComponent } from "./Test"
 import { WebReadBox } from "./WebReadBox"
+import { CatalogDialog } from "./CatalogDialog"
 
 @ComponentV2
 struct Page {
-    @Require @Param navTitle: string
-    @Event changeNavTitle: (value: string) => void
+    private webController = new webview.WebviewController()
+    private bookPageCount = 30
+    @Consumer() pathInfos: NavPathStack = new NavPathStack()
     @Local contentType: 'book' | 'issue' | null = null
     @Local itemId: number | null = null
-    @Require @Param currentBookPage: number
-    @Event changeCurrentBookPage: (value: number) => void
-    @Consumer() pathInfos: NavPathStack = new NavPathStack()
-    webController = new webview.WebviewController()
-    /**
-     * 是否正在翻页的过程中，该值为 true 时，翻页按钮禁用
-     */
+    @Local navTitle: string = ''
+    @Local currentBookPage: number = 1
+    /** 是否正在翻页的过程中，该值为 true 时，翻页按钮禁用 */
     @Local isRequestingPage: boolean = false
     /** BookPage 和对应 Content 的映射
      *
-     * 正文缓存，如果指定页码的正文存在，则读取缓存，否则就要请求后端返回正文，并存入缓存
-     */
-    contentMap: Map<number, Content> = new Map()
+     * 正文缓存，如果指定页码的正文存在，则读取缓存，否则就要请求后端返回正文，并存入缓存 */
+    @Local contentMap: Map<number, Content> = new Map()
     /** 目录缓存，只写入一次，后续只要数组不为空就不再写入 */
     @Local catalogs: CatalogInInfo[] = []
-    private bookPageCount = 30
     /** 当前正文缓存中的最大页码，每次写入正文缓存，都会更新该值
      *
-     * 该值不等于正文 Map 的项目数量，因为正文 Map 初始只是存储了请求页码周期的内容数据
-     */
+     * 该值不等于正文 Map 的项目数量，因为正文 Map 初始只是存储了请求页码周期的内容数据 */
     @Local maxPageNum: number = 0
     /** 该值一旦为 true，则下一页按钮禁用
      *
-     * 同时，每次写入正文缓存，都会更新 maxBookPage，当 currentBookPage 等于 maxBookPage 时，也会禁用下一页按钮。
-     */
+     * 同时，每次写入正文缓存，都会更新 maxBookPage，当 currentBookPage 等于 maxBookPage 时，也会禁用下一页按钮。 */
     @Local noMore: boolean = false
+    private catalogDialogId: number = 0
 
     aboutToAppear(): void {
-        const param = this.queryNavDestinationInfo()?.param as ContentPageParam | undefined
+        const param = this.pathInfos.getParamByName('Content')[0] as ContentPageParam | undefined
+        // const param = this.queryNavDestinationInfo()?.param as ContentPageParam | undefined
         if (!param) {
             promptAction.showToast({ message: '页面参数错误' })
             this.pathInfos.pop()
@@ -52,7 +46,7 @@ struct Page {
 
         this.itemId = param.itemId
         this.contentType = param.type
-        this.changeCurrentBookPage(param.currentBookPage)
+        this.currentBookPage = param.currentBookPage
         this.changeToPage(param.currentBookPage)
     }
 
@@ -61,7 +55,7 @@ struct Page {
      *
      * @param page
      */
-    async changeToPage(page: number) {
+    async changeToPage(page: number): Promise<void> {
         this.isRequestingPage = true
         if (!this.contentMap.has(page)) {
             // 缓存中没有找到数据，发请求获取
@@ -89,7 +83,7 @@ struct Page {
         }
         // 比如当前章节的起始页码是 A，那么只要处于当前章节内部，都满足 A <= currentPage，可是上一章节的起始页码 B，也满足 B <= A <= currentPage
         // 所以。取 <= currentPage 的章节的最后一个项目，就是当前的章节。
-        this.changeNavTitle(getCatalogTitleByBookPage(page, this.catalogs))
+        this.navTitle = getCatalogTitleByBookPage(page, this.catalogs)
         // 将翻页的目标正文载入到 Web 容器
         this.webController.loadData(
             makePageHTML(this.contentMap.get(page)!.content),
@@ -97,7 +91,7 @@ struct Page {
         )
         await updateReadHistory(this.itemId as number, this.contentType as InfoType, page)
         this.isRequestingPage = false
-        this.changeCurrentBookPage(page)
+        this.currentBookPage = page
     }
 
     /**
@@ -113,14 +107,83 @@ struct Page {
     }
 
     build() {
-        RelativeContainer() {
-            WebReadBox({
-                webController: this.webController,
-            }).height('100%')
-            this.BottomPanel()
+        NavDestination() {
+            RelativeContainer() {
+                WebReadBox({
+                    webController: this.webController,
+                }).height('100%')
+                this.BottomPanel()
+            }
+            .width('100%')
+            .height('100%')
         }
-        .width('100%')
-        .height('100%')
+        .onBackPressed(() => {
+            this.pathInfos.pop({
+                currentBookPage: this.currentBookPage
+            } as ContentPagePopResult)
+            return true
+        })
+        .title(this.navTitle)
+        .menus([
+            {
+                value: '目录',
+                action: () => {
+                    promptAction.openCustomDialog({
+                        builder: () => {
+                            this.CatalogDialog()
+                        }
+                    }).then(id => this.catalogDialogId = id)
+                },
+                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.list_square'))
+            },
+            {
+                value: '添加书签',
+                action: () => {
+
+                },
+                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.bookmark'))
+            },
+            {
+                value: '书刊详情',
+                action: () => {
+
+                },
+                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.AI_circle_viewfinder'))
+            },
+            {
+                value: '书签列表',
+                action: () => {
+
+                },
+                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.bookmark'))
+            },
+            {
+                value: '阅读设置',
+                action: () => {
+
+                },
+                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.gearshape'))
+            },
+            {
+                // 统计一些字段的值，比如当前的行间距，字号，背景颜色，历史阅读记录，当前页码，总页码等
+                value: '统计信息',
+                action: () => {
+
+                },
+                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.info_circle'))
+            }
+        ])
+
+    }
+
+    @Builder
+    CatalogDialog() {
+        CatalogDialog({
+            catalogs: this.catalogs,
+            currentBookPage: this.currentBookPage,
+            changeToPage: page => this.changeToPage(page),
+            close: () => promptAction.closeCustomDialog(this.catalogDialogId)
+        })
     }
 
     @Builder
@@ -176,83 +239,9 @@ struct Page {
 }
 
 
-@ComponentV2
-struct PageNav {
-    @Local navTitle: string = ''
-    @Local currentBookPage: number = 1
-    @Consumer() pathInfos: NavPathStack = new NavPathStack()
-
-    build() {
-        NavDestination() {
-            Page({
-                navTitle: this.navTitle,
-                changeNavTitle: value => {
-                    this.navTitle = value
-                },
-                currentBookPage: this.currentBookPage,
-                changeCurrentBookPage: value => {
-                    this.currentBookPage = value
-                }
-            })
-        }
-        .onBackPressed(() => {
-            this.pathInfos.pop({
-                currentBookPage: this.currentBookPage
-            } as ContentPagePopResult)
-            return true
-        })
-        .title(this.navTitle)
-        .menus([
-            {
-                value: '目录',
-                action: () => {
-
-                },
-                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.list_square'))
-            },
-            {
-                value: '添加书签',
-                action: () => {
-
-                },
-                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.bookmark'))
-            },
-            {
-                value: '书刊详情',
-                action: () => {
-
-                },
-                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.AI_circle_viewfinder'))
-            },
-            {
-                value: '书签列表',
-                action: () => {
-
-                },
-                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.bookmark'))
-            },
-            {
-                value: '阅读设置',
-                action: () => {
-
-                },
-                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.gearshape'))
-            },
-            {
-                // 统计一些字段的值，比如当前的行间距，字号，背景颜色，历史阅读记录，当前页码，总页码等
-                value: '统计信息',
-                action: () => {
-
-                },
-                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.info_circle'))
-            }
-        ])
-    }
-}
-
 @Builder
 export function PageBuilder() {
-    PageNav()
+    Page()
 }
 
 export interface ContentPageParam {

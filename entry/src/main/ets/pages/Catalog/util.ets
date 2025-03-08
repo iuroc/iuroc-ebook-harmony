@@ -64,6 +64,7 @@ export interface CatalogInInfo {
     parentId: number
     id: number
     level: number
+    hasChild: boolean
 }
 
 export async function getOneBookShelf(itemId: number, type: InfoType) {
