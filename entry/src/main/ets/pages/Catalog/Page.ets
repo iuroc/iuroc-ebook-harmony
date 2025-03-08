@@ -17,6 +17,7 @@ import { BSColor } from '@iuroc/bootstrap5-color'
 import { extname, extToMime, getPreviewFileUriForImageURL, replaceChinesePunctuation } from '../../common/util'
 import { filePreview } from '@kit.PreviewKit'
 import { ContentPageParam, ContentPagePopResult } from '../Content/Page'
+import { getCatalogTitleByBookPage } from '../Content/util'
 
 @ComponentV2
 struct FieldRow {
@@ -57,8 +58,6 @@ struct Page {
     @Local cover: string = ''
     @Local bookInfo?: BookInfoObservedV2
     @Local issueInfo?: IssueInfoInObservedV2
-    /** 是否显示继续阅读 */
-    @Local continueRead: boolean = true
     @Consumer() pathInfos: NavPathStack = new NavPathStack()
     /**
      * 是否已在书架
@@ -101,6 +100,7 @@ struct Page {
         Scroll() {
             Column({ space: 15 }) {
                 this.NavCard()
+                this.ContinueRead()
                 this.Summary()
                 this.CatalogList()
             }
@@ -111,6 +111,44 @@ struct Page {
         .width('100%')
         .align(Alignment.Top)
         .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+    }
+
+    @Builder
+    ContinueRead() {
+        if ((this.currentBookPage || 1) > 1) {
+            Column() {
+                Row() {
+                    Text() {
+                        Span('继续阅读：')
+                        Span(getCatalogTitleByBookPage(this.currentBookPage || 1,
+                            (this.type == 'book' ? this.bookInfo?.catalogs :
+                                this.issueInfo?.catalogs) as CatalogInInfo[]))
+                            .fontWeight(FontWeight.Bold)
+                    }
+                    .fontColor(BSColor.warning_text_emphasis)
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                }
+                .width('100%')
+                .padding({
+                    left: 15,
+                    right: 15,
+                    top: 10,
+                    bottom: 10
+                })
+                .border({
+                    width: 1,
+                    color: BSColor.warning_border_subtle,
+                })
+                .backgroundColor(BSColor.warning_bg_subtle)
+                .borderRadius(10)
+                .onClick(() => {
+                    this.gotoContentPage()
+                })
+            }
+            .width('100%')
+            .padding({ left: 10, right: 10 })
+        }
     }
 
     @Builder
@@ -259,6 +297,7 @@ struct Page {
                     Button('开始阅读').layoutWeight(1)
                         .enabled(this.currentBookPage != null)
                         .onClick(() => {
+                            this.currentBookPage = 1
                             this.gotoContentPage()
                         })
                     Button(this.isInBookShelf ? '已在书架' : '加到书架')
@@ -387,7 +426,7 @@ export class IssueInfoInObservedV2 implements IssueInfoInResponse {
     @Trace name: string
     @Trace cover: string
     @Trace magazine: MagazineInfoObservedV2
-    @Trace catalogs: Catalog[]
+    @Trace catalogs: CatalogInInfo[]
 
     constructor(init: IssueInfoInResponse) {
         this.id = init.id

@@ -39,7 +39,7 @@ export interface IssueInfoNoCatalogsInResponse {
 }
 
 export interface IssueInfoInResponse extends IssueInfoNoCatalogsInResponse {
-    catalogs: Catalog[]
+    catalogs: CatalogInInfo[]
 }
 
 export type InfoType = 'book' | 'issue'

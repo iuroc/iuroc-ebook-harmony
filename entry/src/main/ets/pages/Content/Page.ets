@@ -1,6 +1,6 @@
 import { promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
 import { Content } from '../Index/common/lib'
-import { getContentAndCatalog, getInfoOnly, makePageHTML, updateReadHistory } from "./util"
+import { getCatalogTitleByBookPage, getContentAndCatalog, getInfoOnly, makePageHTML, updateReadHistory } from "./util"
 import { webview } from "@kit.ArkWeb"
 import { apiOrigin } from "../../common/config"
 import { CatalogInInfo, InfoType } from "../Catalog/util"
@@ -89,7 +89,7 @@ struct Page {
         }
         // 比如当前章节的起始页码是 A，那么只要处于当前章节内部，都满足 A <= currentPage，可是上一章节的起始页码 B，也满足 B <= A <= currentPage
         // 所以。取 <= currentPage 的章节的最后一个项目，就是当前的章节。
-        this.changeNavTitle(this.catalogs.filter(item => item.page <= page).slice(-1)[0].title)
+        this.changeNavTitle(getCatalogTitleByBookPage(page, this.catalogs))
         // 将翻页的目标正文载入到 Web 容器
         this.webController.loadData(
             makePageHTML(this.contentMap.get(page)!.content),

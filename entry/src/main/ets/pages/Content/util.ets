@@ -111,3 +111,7 @@ export function makePageHTML(content: string) {
 
     </html>`
 }
+
+export function getCatalogTitleByBookPage(page: number, catalogs: CatalogInInfo[]) {
+    return catalogs.filter(item => item.page <= page).slice(-1)[0].title
+}
