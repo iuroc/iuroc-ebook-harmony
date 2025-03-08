@@ -182,7 +182,8 @@ struct Page {
                                     .wordBreak(WordBreak.BREAK_ALL)
                                     .maxLines(1)
                                     .textOverflow({ overflow: TextOverflow.Ellipsis })
-                                    .fontColor(catalog.level == 0 ? BSColor.secondary_text_emphasis : BSColor.secondary)
+                                    .fontColor(catalog.page == null ? BSColor.secondary :
+                                        (catalog.level == 0 ? BSColor.secondary_text_emphasis : BSColor.secondary))
                                     .width('100%')
                             }
                             .layoutWeight(1)
@@ -190,7 +191,7 @@ struct Page {
                         }
                         .stateStyles({
                             pressed: {
-                                .backgroundColor(BSColor.secondary_bg_subtle)
+                                .backgroundColor(catalog.page == null ? undefined : BSColor.secondary_bg_subtle)
                             },
                             normal: {
                                 .backgroundColor(Color.Transparent)
@@ -198,8 +199,10 @@ struct Page {
                         })
                         .padding({ left: 15, right: 15 })
                         .onClick(() => {
-                            this.currentBookPage = catalog.page
-                            this.gotoContentPage()
+                            if (catalog.page != null) {
+                                this.currentBookPage = catalog.page
+                                this.gotoContentPage()
+                            }
                         })
                     })
             }

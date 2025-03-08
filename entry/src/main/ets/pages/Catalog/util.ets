@@ -46,11 +46,11 @@ export type InfoType = 'book' | 'issue'
 
 @ObservedV2
 export class CatalogObservedV2 {
-    @Trace page: number
+    @Trace page: number | null
     @Trace title: string
     @Trace level: number
 
-    constructor(page: number, title: string, level: number) {
+    constructor(page: number | null, title: string, level: number) {
         this.page = page
         this.title = title
         this.level = level
@@ -58,7 +58,7 @@ export class CatalogObservedV2 {
 }
 
 export interface CatalogInInfo {
-    page: number
+    page: number | null
     title: string
     index: number
     parentId: number

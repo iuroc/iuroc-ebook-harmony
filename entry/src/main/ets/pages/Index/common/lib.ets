@@ -26,7 +26,7 @@ declare abstract class ReadItem {
 
 declare abstract class Catalog {
     id: number;
-    page: number;
+    page: number | null;
     title: string;
     parentId: number;
     index: number;

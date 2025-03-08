@@ -34,7 +34,7 @@ export struct CatalogDialog {
                         if (catalog.hasChild) {
                             SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill')).fontColor([BSColor.secondary])
                         }
-                        Text(catalog.title)
+                        Text(catalog.title).fontColor(catalog.page == null ? BSColor.secondary : BSColor.black)
                     }
                     .width('100%')
                     .padding({
@@ -46,15 +46,17 @@ export struct CatalogDialog {
                     .borderRadius(10)
                     .stateStyles({
                         pressed: {
-                            .backgroundColor(BSColor.secondary_bg_subtle)
+                            .backgroundColor(catalog.page == null ? undefined : BSColor.secondary_bg_subtle)
                         },
                         normal: {
                             .backgroundColor(index == this.activeIndex ? BSColor.success_bg_subtle : Color.Transparent)
                         }
                     })
                     .onClick(() => {
-                        this.changeToPage(catalog.page)
-                        this.close()
+                        if (catalog.page != null) {
+                            this.changeToPage(catalog.page)
+                            this.close()
+                        }
                     })
                 })
             }
@@ -81,8 +83,12 @@ export struct CatalogDialog {
 
     getActiveIndex(): number {
         for (let i = 0; i < this.catalogs.length; i++) {
-            if (this.currentBookPage >= this.catalogs[i].page && (!this.catalogs[i + 1] ||
-                this.catalogs[i + 1].page > this.currentBookPage)) {
+            const page = this.catalogs[i].page
+            const nextPage = this.catalogs[i + 1].page
+            if (!page) {
+                continue
+            } else if (this.currentBookPage >= page && (!nextPage ||
+                nextPage > this.currentBookPage)) {
                 return i
             }
         }
