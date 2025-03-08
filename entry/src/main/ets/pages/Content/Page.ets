@@ -1,6 +1,6 @@
 import { promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
 import { Content } from '../Index/common/lib'
-import { getContentAndCatalog, getInfoOnly, makePageHTML } from "./util"
+import { getContentAndCatalog, getInfoOnly, makePageHTML, updateReadHistory } from "./util"
 import { webview } from "@kit.ArkWeb"
 import { apiOrigin } from "../../common/config"
 import { CatalogInInfo, InfoType } from "../Catalog/util"
@@ -15,9 +15,14 @@ struct Page {
     @Event changeNavTitle: (value: string) => void
     @Local contentType: 'book' | 'issue' | null = null
     @Local itemId: number | null = null
-    @Local currentBookPage: number = 1
+    @Require @Param currentBookPage: number
+    @Event changeCurrentBookPage: (value: number) => void
     @Consumer() pathInfos: NavPathStack = new NavPathStack()
     webController = new webview.WebviewController()
+    /**
+     * 是否正在翻页的过程中，该值为 true 时，翻页按钮禁用
+     */
+    @Local isRequestingPage: boolean = false
     /** BookPage 和对应 Content 的映射
      *
      * 正文缓存，如果指定页码的正文存在，则读取缓存，否则就要请求后端返回正文，并存入缓存
@@ -47,9 +52,8 @@ struct Page {
 
         this.itemId = param.itemId
         this.contentType = param.type
-        this.currentBookPage = param.currentBookPage
-
-        this.changeToPage(this.currentBookPage)
+        this.changeCurrentBookPage(param.currentBookPage)
+        this.changeToPage(param.currentBookPage)
     }
 
     /**
@@ -58,12 +62,13 @@ struct Page {
      * @param page
      */
     async changeToPage(page: number) {
+        this.isRequestingPage = true
         if (!this.contentMap.has(page)) {
             // 缓存中没有找到数据，发请求获取
             const result = await getContentAndCatalog(
                 this.itemId as number,
                 this.contentType as InfoType,
-                this.getStartBookPageByCurrentBookPage(this.currentBookPage),
+                this.getStartBookPageByCurrentBookPage(page),
                 this.bookPageCount,
                 this.catalogs.length == 0  // 如果没有目录缓存，则需要接口返回目录
             )
@@ -84,12 +89,15 @@ struct Page {
         }
         // 比如当前章节的起始页码是 A，那么只要处于当前章节内部，都满足 A <= currentPage，可是上一章节的起始页码 B，也满足 B <= A <= currentPage
         // 所以。取 <= currentPage 的章节的最后一个项目，就是当前的章节。
-        this.changeNavTitle(this.catalogs.filter(item => item.page <= this.currentBookPage).slice(-1)[0].title)
+        this.changeNavTitle(this.catalogs.filter(item => item.page <= page).slice(-1)[0].title)
         // 将翻页的目标正文载入到 Web 容器
         this.webController.loadData(
-            makePageHTML(this.contentMap.get(this.currentBookPage)!.content),
+            makePageHTML(this.contentMap.get(page)!.content),
             'text/html', 'utf-8', apiOrigin
         )
+        await updateReadHistory(this.itemId as number, this.contentType as InfoType, page)
+        this.isRequestingPage = false
+        this.changeCurrentBookPage(page)
     }
 
     /**
@@ -122,9 +130,9 @@ struct Page {
                 .buttonStyle(ButtonStyleMode.NORMAL)
                 .fontColor(BSColor.dark)
                 .fontSize(15)
-                .enabled(this.currentBookPage > 1)
+                .enabled(this.currentBookPage > 1 && !this.isRequestingPage)
                 .onClick(() => {
-                    this.changeToPage(--this.currentBookPage)
+                    this.changeToPage(this.currentBookPage - 1)
                 })
                 .smButton()
             Text(`${this.currentBookPage}/${Math.max(this.catalogs.slice(-1)[0]?.page || 0, this.maxPageNum)}`)
@@ -132,9 +140,9 @@ struct Page {
                 .buttonStyle(ButtonStyleMode.NORMAL)
                 .fontColor(BSColor.dark)
                 .fontSize(15)
-                .enabled(!this.noMore || this.currentBookPage != this.maxPageNum)
+                .enabled(!this.noMore || this.currentBookPage != this.maxPageNum && !this.isRequestingPage)
                 .onClick(() => {
-                    this.changeToPage(++this.currentBookPage)
+                    this.changeToPage(this.currentBookPage + 1)
                 })
                 .smButton()
         }
@@ -171,6 +179,8 @@ struct Page {
 @ComponentV2
 struct PageNav {
     @Local navTitle: string = ''
+    @Local currentBookPage: number = 1
+    @Consumer() pathInfos: NavPathStack = new NavPathStack()
 
     build() {
         NavDestination() {
@@ -178,9 +188,19 @@ struct PageNav {
                 navTitle: this.navTitle,
                 changeNavTitle: value => {
                     this.navTitle = value
+                },
+                currentBookPage: this.currentBookPage,
+                changeCurrentBookPage: value => {
+                    this.currentBookPage = value
                 }
             })
         }
+        .onBackPressed(() => {
+            this.pathInfos.pop({
+                currentBookPage: this.currentBookPage
+            } as ContentPagePopResult)
+            return true
+        })
         .title(this.navTitle)
         .menus([
             {
@@ -240,5 +260,9 @@ export interface ContentPageParam {
     /** bookId 或 issueId */
     itemId: number
     /** 书刊页码，从 1 开始 */
+    currentBookPage: number
+}
+
+export interface ContentPagePopResult {
     currentBookPage: number
 }

@@ -16,7 +16,7 @@ import { apiOrigin } from '../../common/config'
 import { BSColor } from '@iuroc/bootstrap5-color'
 import { extname, extToMime, getPreviewFileUriForImageURL, replaceChinesePunctuation } from '../../common/util'
 import { filePreview } from '@kit.PreviewKit'
-import { ContentPageParam } from '../Content/Page'
+import { ContentPageParam, ContentPagePopResult } from '../Content/Page'
 
 @ComponentV2
 struct FieldRow {
@@ -314,7 +314,12 @@ struct Page {
                 type: this.type,
                 itemId: this.itemId,
                 currentBookPage: this.currentBookPage,
-            } as ContentPageParam
+            } as ContentPageParam,
+            onPop: info => {
+                const result = info.result as ContentPagePopResult
+                // 更新阅读进度
+                this.currentBookPage = result.currentBookPage
+            }
         })
     }
 }

@@ -5,12 +5,12 @@ import { CatalogInInfo, InfoType, IssueInfoInResponse, IssueInfoNoCatalogsInResp
 import { ApiResponse, BookListItemInResponse } from '../Index/common/mixin'
 import { Content } from '../Index/common/lib'
 
-export async function updateReadHistory(itemId: number, type: InfoType, currentBookPage: number) {
+export async function updateReadHistory(bookIdOrIssueId: number, type: InfoType, currentBookPage: number) {
     const request = http.createHttp()
-    const response = await request.request(apiOrigin + '/api/ebook/history/get', {
+    const response = await request.request(apiOrigin + '/api/ebook/history/update', {
         method: http.RequestMethod.POST,
         header: { token: await getToken() },
-        extraData: JSON.stringify({ itemId, type, currentBookPage }),
+        extraData: JSON.stringify({ itemId: bookIdOrIssueId, type, currentBookPage }),
         expectDataType: http.HttpDataType.OBJECT
     })
     const result = response.result as ApiResponse
