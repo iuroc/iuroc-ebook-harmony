@@ -1,5 +1,5 @@
 import { BSColor } from '@iuroc/bootstrap5-color'
-import { CatalogInInfo } from '../Catalog/util'
+import { CatalogInInfo } from '../../Catalog/util'
 import { CustomContentDialog } from '@ohos.arkui.advanced.Dialog'
 
 @ComponentV2
