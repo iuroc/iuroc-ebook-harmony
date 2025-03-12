@@ -6,7 +6,7 @@ import { apiOrigin } from "../../common/config"
 import { CatalogInInfo, InfoType } from "../Catalog/util"
 import { BSColor } from "@iuroc/bootstrap5-color"
 import { WebReadBox } from "./WebReadBox"
-import { CatalogDialog } from "./CatalogDialog"
+import { CatalogDialog } from "./dialogs/CatalogDialog"
 
 @ComponentV2
 struct Page {

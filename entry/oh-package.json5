@@ -6,7 +6,9 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "@iuroc/bootstrap5-color": "^1.0.5"
+    "@iuroc/bootstrap5-color": "^1.0.5",
+    "@iuroc/openai": "^1.0.8",
+    "@iuroc/chat-page": "^1.0.4"
   },
   "devDependencies": {},
   "dynamicDependencies": {}
