@@ -56,6 +56,8 @@ struct Page {
                 .padding(15)
                 .width('100%')
             }
+            .width('100%')
+            .height('100%')
             .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
             .align(Alignment.Top)
         }

@@ -153,7 +153,7 @@ struct Page {
             {
                 value: '书刊详情',
                 action: () => {
-
+                    this.pathInfos.popToName('Catalog')
                 },
                 symbolIcon: new SymbolGlyphModifier($r('sys.symbol.AI_circle_viewfinder'))
             },
