@@ -2,6 +2,7 @@ import { http } from '@kit.NetworkKit'
 import { apiOrigin } from '../../common/config'
 import { ApiResponse } from '../Index/common/mixin'
 import { UserInPreferences } from '../../common/token'
+import { promptAction } from '@kit.ArkUI'
 
 /**
  * 登录和注册聚合接口，完成后请调用 `saveUserToPreferences` 和 `saveToken` 保存用户信息和令牌
@@ -9,7 +10,7 @@ import { UserInPreferences } from '../../common/token'
  * @param password 密码
  * @returns 用户信息和令牌
  */
-export async function loginOrRegister(username: string, password: string): Promise<LoginResult> {
+export async function loginOrRegister(username: string, password: string, showToast = false): Promise<LoginResult> {
     const request = http.createHttp()
     const response = await request.request(apiOrigin + '/api/user/loginOrRegister', {
         method: http.RequestMethod.POST,
@@ -22,8 +23,11 @@ export async function loginOrRegister(username: string, password: string): Promi
     const result = response.result as ApiResponse<LoginResult>
     if (!result.success) {
         throw new Error(result.message)
-    }
-    return result.data
+}
+if (showToast) {
+    promptAction.showToast({ message: result.message })
+}
+return result.data
 }
 
 interface LoginResult {

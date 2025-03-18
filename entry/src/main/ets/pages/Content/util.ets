@@ -1,9 +1,20 @@
 import { http } from '@kit.NetworkKit'
 import { apiOrigin } from '../../common/config'
 import { getToken } from '../../common/token'
-import { CatalogInInfo, InfoType, IssueInfoInResponse, IssueInfoNoCatalogsInResponse } from '../Catalog/util'
+import {
+    BookInfoInResponse,
+    CatalogInInfo,
+    InfoType,
+    IssueInfoInResponse,
+    IssueInfoNoCatalogsInResponse
+} from '../Catalog/util'
 import { ApiResponse, BookListItemInResponse } from '../Index/common/mixin'
 import { Content } from '../Index/common/lib'
+import { systemShare } from '@kit.ShareKit'
+import { uniformTypeDescriptor as utd } from '@kit.ArkData'
+import { promptAction } from '@kit.ArkUI'
+import { common } from '@kit.AbilityKit'
+import { BusinessError } from '@kit.BasicServicesKit'
 
 export async function updateReadHistory(bookIdOrIssueId: number, type: InfoType, currentBookPage: number) {
     const request = http.createHttp()
@@ -44,6 +55,7 @@ export async function getContentAndCatalog(itemId: number, type: InfoType, start
 export interface ContentAndCatalogInResponse {
     contents: Content[]
     catalogs: CatalogInInfo[]
+    info: IssueInfoNoCatalogsInResponse | BookListItemInResponse
 }
 
 interface GetInfoOnlyParam {
@@ -114,4 +126,28 @@ export function makePageHTML(content: string) {
 
 export function getCatalogTitleByBookPage(page: number, catalogs: CatalogInInfo[]) {
     return (catalogs || []).filter(item => item.page && item.page <= page).slice(-1)[0]?.title
+}
+
+/**
+ * 调用系统能力分享文本，并显示 Toast 提示
+ * @param record 需要分享的数据
+ * @throws { BusinessError } 401 - Parameter error.
+ */
+export async function systemShareTextWithToast(
+    title: string,
+    content: string
+): Promise<void> {
+    try {
+        const sharedData = new systemShare.SharedData({
+            utd: utd.UniformDataType.TEXT,
+            title, content,
+        })
+        const controller = new systemShare.ShareController(sharedData)
+        await controller.show(getContext() as common.UIAbilityContext, {
+            selectionMode: systemShare.SelectionMode.SINGLE,
+            previewMode: systemShare.SharePreviewMode.DETAIL,
+        })
+    } catch (error) {
+        promptAction.showToast({ message: `分享失败：${(error as BusinessError).message}` })
+    }
 }

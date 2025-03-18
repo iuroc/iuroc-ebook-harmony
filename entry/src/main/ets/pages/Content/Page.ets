@@ -3,10 +3,11 @@ import { Content } from '../Index/common/lib'
 import { getCatalogTitleByBookPage, getContentAndCatalog, makePageHTML, updateReadHistory } from "./util"
 import { webview } from "@kit.ArkWeb"
 import { apiOrigin } from "../../common/config"
-import { CatalogInInfo, InfoType } from "../Catalog/util"
+import { CatalogInInfo, InfoType, IssueInfoNoCatalogsInResponse } from "../Catalog/util"
 import { BSColor } from "@iuroc/bootstrap5-color"
 import { WebReadBox } from "./WebReadBox"
 import { CatalogDialog } from "./dialogs/CatalogDialog"
+import { BookListItemInResponse } from "../Index/common/mixin"
 
 @ComponentV2
 struct Page {
@@ -34,6 +35,8 @@ struct Page {
      * 同时，每次写入正文缓存，都会更新 maxBookPage，当 currentBookPage 等于 maxBookPage 时，也会禁用下一页按钮。 */
     @Local noMore: boolean = false
     private catalogDialogId: number = 0
+    /** 当前阅读内容所属的图书或期刊的详情 */
+    @Local itemInfo: IssueInfoNoCatalogsInResponse | BookListItemInResponse | null = null
 
     aboutToAppear(): void {
         const param = this.pathInfos.getParamByName('Content')[0] as ContentPageParam | undefined
@@ -66,6 +69,7 @@ struct Page {
                 this.bookPageCount,
                 this.catalogs.length == 0  // 如果没有目录缓存，则需要接口返回目录
             )
+            this.itemInfo = result.info
             // 将目录数据写入缓存
             if (this.catalogs.length == 0 && result.catalogs) {
                 this.catalogs = result.catalogs
@@ -111,6 +115,9 @@ struct Page {
             RelativeContainer() {
                 WebReadBox({
                     webController: this.webController,
+                    itemInfo: this.itemInfo as IssueInfoNoCatalogsInResponse | BookListItemInResponse,
+                    currentBookPage: this.currentBookPage,
+                    contentType: this.contentType as 'book' | 'issue'
                 }).height('100%')
                 this.BottomPanel()
             }

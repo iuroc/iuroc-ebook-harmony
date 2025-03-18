@@ -35,7 +35,7 @@ struct Page {
                 Button('登录 / 注册').width('100%')
                     .enabled(this.checkUsername() && this.checkPassword())
                     .onClick(() => {
-                        loginOrRegister(this.i_username, this.i_password).then(async result => {
+                        loginOrRegister(this.i_username, this.i_password, true).then(async result => {
                             await saveUserToPreferences(result.user)
                             await saveToken(result.token)
                             this.pathInfos.pop({}, false)

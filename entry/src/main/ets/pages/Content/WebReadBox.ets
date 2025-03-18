@@ -2,10 +2,21 @@ import { webview } from '@kit.ArkWeb'
 import { promptAction } from '@kit.ArkUI'
 import { ChatDialog, ChatDialogMode } from './dialogs/Chat'
 import { ChatCompletionMessageParam } from '@iuroc/openai/src/main/ets/openai@4.73.1/resources'
+import { systemShareTextWithToast } from './util'
+import { WebPageParam } from '../Web/Page'
+import { url } from '@kit.ArkTS'
+import { createNote } from '../Note/utils'
+import { IssueInfoNoCatalogsInResponse } from '../Catalog/util'
+import { BookListItemInResponse } from '../Index/common/mixin'
 
 @ComponentV2
 export struct WebReadBox {
     @Require @Param webController: webview.WebviewController
+    @Consumer() pathInfos: NavPathStack = new NavPathStack()
+    /** 当前阅读内容所属的图书或期刊的详情 */
+    @Require @Param itemInfo: IssueInfoNoCatalogsInResponse | BookListItemInResponse
+    @Require @Param currentBookPage: number
+    @Require @Param contentType: 'book' | 'issue'
 
     build() {
         Web({ src: '', controller: this.webController })
@@ -79,19 +90,32 @@ export struct WebReadBox {
                 {
                     content: '分享文本',
                     action: text => {
-
+                        systemShareTextWithToast('分享文本', text as Object as string)
                     }
                 },
                 {
                     content: '百科搜索',
                     action: text => {
-
+                        this.pathInfos.pushPath({
+                            name: 'Web', param: {
+                                src: `https://baike.baidu.com/lemma/api/entry?word=${encodeURIComponent(text as Object as string)}`
+                            } as WebPageParam
+                        })
                     }
                 },
                 {
                     content: '添加摘录',
                     action: text => {
-
+                        createNote('阅读摘录',
+                            `摘录自《${this.contentType == 'issue' ?
+                                (this.itemInfo as IssueInfoNoCatalogsInResponse).magazine.name + ' - ' :
+                                ''}${this.itemInfo.name}》第 ${this.currentBookPage} 页\n\n${text}`)
+                            .then(() => {
+                                promptAction.showToast({ message: '添加摘录成功' })
+                            })
+                            .catch((error: Error) => {
+                                promptAction.showToast({ message: '添加摘录失败' })
+                            })
                     }
                 },
             ])

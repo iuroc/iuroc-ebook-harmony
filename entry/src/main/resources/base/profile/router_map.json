@@ -19,6 +19,26 @@
             "name": "Content",
             "pageSourceFile": "src/main/ets/pages/Content/Page.ets",
             "buildFunction": "PageBuilder"
+        },
+        {
+            "name": "Web",
+            "pageSourceFile": "src/main/ets/pages/Web/Page.ets",
+            "buildFunction": "PageBuilder"
+        },
+        {
+            "name": "Note",
+            "pageSourceFile": "src/main/ets/pages/Note/Page.ets",
+            "buildFunction": "PageBuilder"
+        },
+        {
+            "name": "NoteEdit",
+            "pageSourceFile": "src/main/ets/pages/Note/Edit/Page.ets",
+            "buildFunction": "PageBuilder"
+        },
+        {
+            "name": "NoteView",
+            "pageSourceFile": "src/main/ets/pages/Note/View/Page.ets",
+            "buildFunction": "PageBuilder"
         }
     ]
 }
