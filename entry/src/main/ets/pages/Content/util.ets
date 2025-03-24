@@ -187,7 +187,6 @@ export async function toggleBookMark(title: string, bookPage: number, itemId: nu
         result.data.itemId = itemId
         result.data.type = type
     }
-
     if (!result.success) {
         throw new Error(result.message)
     }

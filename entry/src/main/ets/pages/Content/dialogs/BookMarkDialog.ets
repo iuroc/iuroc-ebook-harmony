@@ -8,6 +8,7 @@ import { SymbolGlyphModifier } from '@kit.ArkUI'
 export struct BookMarkDialog {
     @Require @Param bookMarks: BookMarkInResponse[]
     @Require @Param closeDialog: () => void
+    @Event changeToPage: (page: number) => Promise<void>
 
     build() {
         CustomContentDialog({
@@ -18,7 +19,6 @@ export struct BookMarkDialog {
             contentAreaPadding: {
                 left: 15,
                 right: 15,
-                bottom: 15
             },
             buttons: [
                 {
@@ -34,27 +34,32 @@ export struct BookMarkDialog {
     @Builder
     Content() {
         List() {
-            ForEach(this.bookMarks, (item: BookMarkInResponse, index) => {
-                ListItem() {
-                    ComposeListItem({
-                        contentItem: {
-                            primaryText: item.title,
-                            secondaryText: new Date(item.updateAt).toLocaleString()
-                        },
-                        operateItem: {
-                            text: `P${item.bookPage}`,
-                            icon: {
-                                value: $r('app.media.trash'),
-                                action: () => {
-                                    toggleBookMark(item.title, item.bookPage, item.itemId, item.type).then(() => {
-                                        this.bookMarks.splice(index, 1)
-                                    })
+            ForEach(this.bookMarks.sort((a, b) => new Date(b.updateAt).getTime() - new Date(a.updateAt).getTime()),
+                (item: BookMarkInResponse, index) => {
+                    ListItem() {
+                        ComposeListItem({
+                            contentItem: {
+                                primaryText: item.title,
+                                secondaryText: new Date(item.updateAt).toLocaleString()
+                            },
+                            operateItem: {
+                                text: `P${item.bookPage}`,
+                                icon: {
+                                    value: $r('app.media.trash'),
+                                    action: () => {
+                                        toggleBookMark(item.title, item.bookPage, item.itemId, item.type).then(() => {
+                                            this.bookMarks.splice(index, 1)
+                                        })
+                                    }
                                 }
                             }
-                        }
-                    })
-                }
-            })
+                        })
+                            .onClick(() => {
+                                this.changeToPage(item.bookPage)
+                                this.closeDialog()
+                            })
+                    }
+                })
 
         }
         .width('100%')

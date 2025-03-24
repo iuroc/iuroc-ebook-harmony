@@ -21,7 +21,15 @@ export struct CatalogDialog {
                 this.Content()
             },
             contentAreaPadding: {},
-            primaryTitle: '书刊目录'
+            primaryTitle: '书刊目录',
+            buttons: [
+                {
+                    value: '关闭',
+                    action: () => {
+                        this.close()
+                    }
+                }
+            ]
         })
     }
 

@@ -239,6 +239,7 @@ struct Page {
     BookMarkDialog() {
         BookMarkDialog({
             bookMarks: this.bookMarks,
+            changeToPage: page => this.changeToPage(page),
             closeDialog: () => {
                 promptAction.closeCustomDialog(this.bookMarkDialogId)
             }
