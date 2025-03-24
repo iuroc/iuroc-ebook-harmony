@@ -8,7 +8,7 @@
   "dependencies": {
     "@iuroc/bootstrap5-color": "^1.0.5",
     "@iuroc/openai": "^1.0.8",
-    "@iuroc/chat-page": "^1.0.4"
+    "@iuroc/chat-page": "file:../../../demo/DevEcoStudioProjects/ElderMate/chat_page/build/default/outputs/default/chat_page.har"
   },
   "devDependencies": {},
   "dynamicDependencies": {}

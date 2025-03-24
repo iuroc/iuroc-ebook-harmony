@@ -12,6 +12,7 @@ import { common } from '@kit.AbilityKit'
 import { UserPanel } from './panels/user/UserPanel'
 import { MagazineListItem, MagazinePanel } from './panels/magazine/MagazinePanel'
 import { CategoryTabItem } from './components/CategoryTab'
+import { ToolPanel } from './panels/tool/ToolPanel'
 
 @Entry
 @ComponentV2
@@ -81,6 +82,8 @@ struct Page {
                 changeActiveCategoryIndex: value => this.magazinePanelActiveCategoryIndex = value,
                 items: this.magazinePanelItems
             })
+        } else if (this.activePageIndex == 3) {
+            ToolPanel()
         } else if (this.activePageIndex == 4) {
             UserPanel()
         }

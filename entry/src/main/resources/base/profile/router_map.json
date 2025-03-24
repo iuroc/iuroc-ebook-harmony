@@ -39,6 +39,11 @@
             "name": "NoteView",
             "pageSourceFile": "src/main/ets/pages/Note/View/Page.ets",
             "buildFunction": "PageBuilder"
+        },
+        {
+            "name": "Chat",
+            "pageSourceFile": "src/main/ets/pages/Chat/Page.ets",
+            "buildFunction": "PageBuilder"
         }
     ]
 }
