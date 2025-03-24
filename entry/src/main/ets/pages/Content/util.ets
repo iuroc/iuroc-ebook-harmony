@@ -181,6 +181,13 @@ export async function toggleBookMark(title: string, bookPage: number, itemId: nu
         })
     })
     const result = JSON.parse(response.result as string) as ApiResponse<BookMarkInResponse | null>
+    if (result.data) {
+        result.data.title = title
+        result.data.bookPage = bookPage
+        result.data.itemId = itemId
+        result.data.type = type
+    }
+
     if (!result.success) {
         throw new Error(result.message)
     }

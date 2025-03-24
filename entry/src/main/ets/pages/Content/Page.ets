@@ -1,6 +1,7 @@
 import { promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
 import { Content } from '../Index/common/lib'
 import {
+    BookMarkInResponse,
     getBookMarks,
     getCatalogTitleByBookPage,
     getContentAndCatalog,
@@ -36,7 +37,7 @@ struct Page {
     /**
      * 当前书刊的书签列表的 Book 页码序列
      */
-    @Local bookMarkBookPages: number[] = []
+    @Local bookMarks: BookMarkInResponse[] = []
     /** 当前正文缓存中的最大页码，每次写入正文缓存，都会更新该值
      *
      * 该值不等于正文 Map 的项目数量，因为正文 Map 初始只是存储了请求页码周期的内容数据 */
@@ -64,7 +65,7 @@ struct Page {
 
         getBookMarks(this.itemId, this.contentType, 0, 240).then(result => {
             result.forEach(item => {
-                this.bookMarkBookPages.push(item.bookPage)
+                this.bookMarks.push(item)
             })
         }).catch((error: Error) => {
             promptAction.showToast(error)
@@ -129,6 +130,14 @@ struct Page {
         return Math.floor((currentBookPage - 1) / this.bookPageCount) * this.bookPageCount + 1
     }
 
+    bookMarkIcon() {
+        if (this.bookMarks.find(item => item.bookPage == this.currentBookPage)) {
+            return new SymbolGlyphModifier($r('sys.symbol.bookmark_fill')).fontColor([BSColor.warning])
+        } else {
+            return new SymbolGlyphModifier($r('sys.symbol.bookmark'))
+        }
+    }
+
     build() {
         NavDestination() {
             RelativeContainer() {
@@ -167,17 +176,15 @@ struct Page {
                 action: () => {
                     toggleBookMark(this.navTitle, this.currentBookPage, this.itemId, this.contentType).then(result => {
                         if (result) {
-                            this.bookMarkBookPages.push(this.currentBookPage)
+                            this.bookMarks.push(result)
                         } else {
-                            this.bookMarkBookPages = this.bookMarkBookPages.filter(i => i != this.currentBookPage)
+                            this.bookMarks = this.bookMarks.filter(i => i.bookPage != this.currentBookPage)
                         }
                     }).catch((error: Error) => {
                         promptAction.showToast(error)
                     })
                 },
-                symbolIcon: this.bookMarkBookPages.includes(this.currentBookPage) ?
-                new SymbolGlyphModifier($r('sys.symbol.bookmark_fill')).fontColor([BSColor.warning]) :
-                    new SymbolGlyphModifier($r('sys.symbol.bookmark'))
+                symbolIcon: this.bookMarkIcon()
             },
             {
                 value: '书刊详情',
