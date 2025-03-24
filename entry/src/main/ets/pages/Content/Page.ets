@@ -240,6 +240,7 @@ struct Page {
     @Builder
     CatalogDialog() {
         CatalogDialog({
+            readSettingOptions: this.readSettingOptions,
             catalogs: this.catalogs,
             currentBookPage: this.currentBookPage,
             changeToPage: page => this.changeToPage(page),
@@ -261,6 +262,7 @@ struct Page {
     @Builder
     BookMarkDialog() {
         BookMarkDialog({
+            readSettingOptions: this.readSettingOptions,
             bookMarks: this.bookMarks,
             changeToPage: page => this.changeToPage(page),
             closeDialog: () => {

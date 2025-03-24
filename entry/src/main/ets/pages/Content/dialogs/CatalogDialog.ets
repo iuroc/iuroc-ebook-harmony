@@ -1,6 +1,7 @@
 import { BSColor } from '@iuroc/bootstrap5-color'
 import { CatalogInInfo } from '../../Catalog/util'
 import { CustomContentDialog } from '@ohos.arkui.advanced.Dialog'
+import { SettingOptionObservedV2, themeGroup } from '../WebReadBox'
 
 @ComponentV2
 export struct CatalogDialog {
@@ -10,6 +11,7 @@ export struct CatalogDialog {
     @Require @Param close: () => void
     scroller = new Scroller()
     @Local activeIndex: number = 0
+    @Require @Param readSettingOptions: SettingOptionObservedV2
 
     aboutToAppear(): void {
         this.activeIndex = this.getActiveIndex()
@@ -57,7 +59,8 @@ export struct CatalogDialog {
                             .backgroundColor(catalog.page == null ? undefined : BSColor.secondary_bg_subtle)
                         },
                         normal: {
-                            .backgroundColor(index == this.activeIndex ? BSColor.success_bg_subtle : Color.Transparent)
+                            .backgroundColor(index == this.activeIndex ?
+                            themeGroup[this.readSettingOptions.themeIndex].backgroundColor : Color.Transparent)
                         }
                     })
                     .onClick(() => {

@@ -3,12 +3,14 @@ import { BookMarkInResponse, toggleBookMark } from '../util'
 import { ComposeListItem } from '@ohos.arkui.advanced.ComposeListItem'
 import { formatDateChinese } from '../../../common/util'
 import { promptAction, SymbolGlyphModifier } from '@kit.ArkUI'
+import { SettingOptionObservedV2 } from '../WebReadBox'
 
 @ComponentV2
 export struct BookMarkDialog {
     @Require @Param bookMarks: BookMarkInResponse[]
     @Require @Param closeDialog: () => void
     @Event changeToPage: (page: number) => Promise<void>
+    @Require @Param readSettingOptions: SettingOptionObservedV2
 
     build() {
         CustomContentDialog({
