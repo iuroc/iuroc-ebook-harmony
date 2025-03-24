@@ -16,6 +16,7 @@ import { BSColor } from "@iuroc/bootstrap5-color"
 import { WebReadBox } from "./WebReadBox"
 import { CatalogDialog } from "./dialogs/CatalogDialog"
 import { BookListItemInResponse } from "../Index/common/mixin"
+import { BookMarkDialog } from "./dialogs/BookMarkDialog"
 
 @ComponentV2
 struct Page {
@@ -47,6 +48,7 @@ struct Page {
      * 同时，每次写入正文缓存，都会更新 maxBookPage，当 currentBookPage 等于 maxBookPage 时，也会禁用下一页按钮。 */
     @Local noMore: boolean = false
     private catalogDialogId: number = 0
+    private bookMarkDialogId: number = 0
     /** 当前阅读内容所属的图书或期刊的详情 */
     @Local itemInfo: IssueInfoNoCatalogsInResponse | BookListItemInResponse | null = null
 
@@ -196,7 +198,11 @@ struct Page {
             {
                 value: '书签列表',
                 action: () => {
-
+                    promptAction.openCustomDialog({
+                        builder: () => {
+                            this.BookMarkDialog()
+                        },
+                    }).then(id => this.bookMarkDialogId = id)
                 },
                 symbolIcon: new SymbolGlyphModifier($r('sys.symbol.bookmark'))
             },
@@ -226,6 +232,16 @@ struct Page {
             currentBookPage: this.currentBookPage,
             changeToPage: page => this.changeToPage(page),
             close: () => promptAction.closeCustomDialog(this.catalogDialogId)
+        })
+    }
+
+    @Builder
+    BookMarkDialog() {
+        BookMarkDialog({
+            bookMarks: this.bookMarks,
+            closeDialog: () => {
+                promptAction.closeCustomDialog(this.bookMarkDialogId)
+            }
         })
     }
 
