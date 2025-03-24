@@ -110,10 +110,10 @@ export function makePageHTML(content: string, settingOption: SettingOptionObserv
 
             body {
                 margin: 0;
-                letter-spacing: ${settingOption.cssLetterSpacing};
+                letter-spacing: ${settingOption.cssLetterSpacing}px;
                 line-height: ${settingOption.cssLineHeight};
                 text-align: justify;
-                font-size: ${settingOption.cssFontSize};
+                font-size: ${settingOption.cssFontSize}px;
                 color: ${themeGroup[settingOption.themeIndex].fontColor};
                 background-color: ${themeGroup[settingOption.themeIndex].backgroundColor};
             }
@@ -217,9 +217,9 @@ export interface BookMarkInResponse extends BookMarkNoDate {
 export function loadReadSetting() {
     const data = preferences.getPreferencesSync(getContext(), { name: 'ReadSetting' })
     const option = new SettingOptionObservedV2()
-    option.cssFontSize = data.getSync('cssFontSize', '16px') as string
-    option.cssLineHeight = data.getSync('cssLineHeight', '1.5') as string
-    option.cssLetterSpacing = data.getSync('cssLetterSpacing', '1px') as string
+    option.cssFontSize = data.getSync('cssFontSize', 16) as number
+    option.cssLineHeight = data.getSync('cssLineHeight', 1.5) as number
+    option.cssLetterSpacing = data.getSync('cssLetterSpacing', 1) as number
     option.themeIndex = data.getSync('themeIndex', 0) as number
     return option
 }
@@ -241,7 +241,7 @@ export function updateWebSetting(controller: webview.WebviewController, setting:
     const theme = themeGroup[setting.themeIndex]
     controller.runJavaScript(`document.body.style.color = '${theme.fontColor}'`)
     controller.runJavaScript(`document.body.style.backgroundColor = '${theme.backgroundColor}'`)
-    controller.runJavaScript(`document.body.style.fontSize = '${setting.cssFontSize}'`)
+    controller.runJavaScript(`document.body.style.fontSize = '${setting.cssFontSize}px'`)
     controller.runJavaScript(`document.body.style.lineHeight = '${setting.cssLineHeight}'`)
-    controller.runJavaScript(`document.body.style.letterSpacing = '${setting.cssLetterSpacing}'`)
+    controller.runJavaScript(`document.body.style.letterSpacing = '${setting.cssLetterSpacing}px'`)
 }

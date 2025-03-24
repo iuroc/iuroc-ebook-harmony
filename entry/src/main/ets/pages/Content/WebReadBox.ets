@@ -153,62 +153,73 @@ export struct WebReadBox {
 }
 
 export interface ThemeGroupItem {
-    fontColor: string
-    backgroundColor: string
+    fontColor: ResourceColor
+    backgroundColor: ResourceColor
+    mainColor: ResourceColor
     groupName: string
 }
 
 @ObservedV2
 export class ThemeGroupItemObservedV2 {
-    @Trace fontColor: string
-    @Trace backgroundColor: string
+    @Trace fontColor: ResourceColor
+    @Trace backgroundColor: ResourceColor
+    @Trace mainColor: ResourceColor
     @Trace groupName: string
 
     constructor(init: ThemeGroupItem) {
         this.fontColor = init.fontColor
         this.backgroundColor = init.backgroundColor
         this.groupName = init.groupName
+        this.mainColor = init.mainColor
     }
 }
 
 export const themeGroup: ThemeGroupItemObservedV2[] = [
     new ThemeGroupItemObservedV2({
         fontColor: BSColor.dark,
-        backgroundColor: BSColor.white,
+        mainColor: BSColor.primary,
+        backgroundColor: Color.Transparent,
         groupName: '默认'
     }),
     new ThemeGroupItemObservedV2({
         fontColor: BSColor.success_text_emphasis,
+        mainColor: BSColor.success,
         backgroundColor: BSColor.success_bg_subtle,
         groupName: 'success'
     }),
     new ThemeGroupItemObservedV2({
         fontColor: BSColor.danger_text_emphasis,
+        mainColor: BSColor.danger,
         backgroundColor: BSColor.danger_bg_subtle,
         groupName: 'danger'
     }),
     new ThemeGroupItemObservedV2({
         fontColor: BSColor.primary_text_emphasis,
+        mainColor: BSColor.primary,
         backgroundColor: BSColor.primary_bg_subtle,
         groupName: 'primary'
     }),
     new ThemeGroupItemObservedV2({
         fontColor: BSColor.warning_text_emphasis,
+        mainColor: BSColor.warning,
         backgroundColor: BSColor.warning_bg_subtle,
         groupName: 'warning'
     }),
     new ThemeGroupItemObservedV2({
         fontColor: BSColor.secondary_text_emphasis,
+        mainColor: BSColor.secondary,
         backgroundColor: BSColor.secondary_bg_subtle,
         groupName: 'secondary'
     }),
     new ThemeGroupItemObservedV2({
         fontColor: BSColor.dark_text_emphasis,
+        mainColor: BSColor.dark,
         backgroundColor: BSColor.dark_bg_subtle,
         groupName: 'dark'
     }),
     new ThemeGroupItemObservedV2({
         fontColor: BSColor.info_text_emphasis,
+        mainColor: BSColor.info,
         backgroundColor: BSColor.info_bg_subtle,
         groupName: 'info'
     }),
@@ -217,7 +228,7 @@ export const themeGroup: ThemeGroupItemObservedV2[] = [
 @ObservedV2
 export class SettingOptionObservedV2 {
     @Trace themeIndex: number = 0
-    @Trace cssFontSize: string = '16px'
-    @Trace cssLineHeight: string = '1.5'
-    @Trace cssLetterSpacing: string = '1px'
+    @Trace cssFontSize: number = 16
+    @Trace cssLineHeight: number = 1.5
+    @Trace cssLetterSpacing: number = 1
 }

@@ -60,7 +60,7 @@ export struct CatalogDialog {
                         },
                         normal: {
                             .backgroundColor(index == this.activeIndex ?
-                                (themeGroup[this.readSettingOptions.themeIndex].backgroundColor == BSColor.white ?
+                                (this.readSettingOptions.themeIndex == 0 ?
                                 BSColor.success_bg_subtle :
                                 themeGroup[this.readSettingOptions.themeIndex].backgroundColor) : Color.Transparent)
                         }
