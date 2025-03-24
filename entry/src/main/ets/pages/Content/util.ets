@@ -151,3 +151,51 @@ export async function systemShareTextWithToast(
         promptAction.showToast({ message: `分享失败：${(error as BusinessError).message}` })
     }
 }
+
+export async function getBookMarks(itemId: number, type: InfoType, page: number = 0, pageSize: number = 72) {
+    const request = http.createHttp()
+    const response = await request.request(apiOrigin + '/api/ebook/bookMark/list', {
+        method: http.RequestMethod.POST,
+        header: { token: await getToken() },
+        extraData: JSON.stringify({
+            itemId, type,
+        })
+    })
+    const result = JSON.parse(response.result as string) as ApiResponse<BookMarkInResponse[]>
+    if (!result.success) {
+        throw new Error(result.message)
+    }
+    return result.data
+}
+
+export async function toggleBookMark(title: string, bookPage: number, itemId: number, type: InfoType) {
+    const request = http.createHttp()
+    const response = await request.request(apiOrigin + '/api/ebook/bookMark/toggle', {
+        method: http.RequestMethod.POST,
+        header: { token: await getToken() },
+        extraData: JSON.stringify({
+            title,
+            bookPage,
+            itemId,
+            type,
+        })
+    })
+    const result = JSON.parse(response.result as string) as ApiResponse<BookMarkInResponse | null>
+    if (!result.success) {
+        throw new Error(result.message)
+    }
+    return result.data
+}
+
+export interface BookMarkNoDate {
+    id: number
+    title: string
+    bookPage: number
+    itemId: number
+    type: InfoType
+}
+
+export interface BookMarkInResponse extends BookMarkNoDate {
+    updateAt: string
+    createAt: string
+}
