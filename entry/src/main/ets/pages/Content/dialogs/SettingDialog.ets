@@ -59,6 +59,5 @@ export struct SettingDialog {
             .width('100%')
         }
         .width('100%')
-        .edgeEffect(EdgeEffect.Spring)
     }
 }

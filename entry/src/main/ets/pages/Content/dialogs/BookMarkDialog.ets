@@ -19,8 +19,8 @@ export struct BookMarkDialog {
             },
             primaryTitle: '书签列表',
             contentAreaPadding: {
-                left: 15,
-                right: 15,
+                left: 10,
+                right: 10,
             },
             buttons: [
                 {
@@ -50,6 +50,9 @@ export struct BookMarkDialog {
                                     value: $r('app.media.trash'),
                                     action: () => {
                                         this.bookMarks.splice(index, 1)
+                                        if (this.bookMarks.length == 0) {
+                                            this.closeDialog()
+                                        }
                                         toggleBookMark(item.title, item.bookPage, item.itemId, item.type).then(() => {
                                         }).catch((error: Error) => {
                                             promptAction.showToast(error)
@@ -67,7 +70,7 @@ export struct BookMarkDialog {
 
         }
         .width('100%')
-        .height('100%')
+        .height('auto')
         .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
     }
 }

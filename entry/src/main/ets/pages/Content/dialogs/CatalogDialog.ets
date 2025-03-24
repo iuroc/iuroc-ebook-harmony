@@ -60,7 +60,9 @@ export struct CatalogDialog {
                         },
                         normal: {
                             .backgroundColor(index == this.activeIndex ?
-                            themeGroup[this.readSettingOptions.themeIndex].backgroundColor : Color.Transparent)
+                                (themeGroup[this.readSettingOptions.themeIndex].backgroundColor == BSColor.white ?
+                                BSColor.success_bg_subtle :
+                                themeGroup[this.readSettingOptions.themeIndex].backgroundColor) : Color.Transparent)
                         }
                     })
                     .onClick(() => {
@@ -88,8 +90,6 @@ export struct CatalogDialog {
         }
         .align(Alignment.Top)
         .width('100%')
-        .height('100%')
-        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
     }
 
     getActiveIndex(): number {
