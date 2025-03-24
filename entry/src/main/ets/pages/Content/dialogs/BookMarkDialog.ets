@@ -2,7 +2,7 @@ import { CustomContentDialog } from '@ohos.arkui.advanced.Dialog'
 import { BookMarkInResponse, toggleBookMark } from '../util'
 import { ComposeListItem } from '@ohos.arkui.advanced.ComposeListItem'
 import { formatDateChinese } from '../../../common/util'
-import { SymbolGlyphModifier } from '@kit.ArkUI'
+import { promptAction, SymbolGlyphModifier } from '@kit.ArkUI'
 
 @ComponentV2
 export struct BookMarkDialog {
@@ -47,8 +47,10 @@ export struct BookMarkDialog {
                                 icon: {
                                     value: $r('app.media.trash'),
                                     action: () => {
+                                        this.bookMarks.splice(index, 1)
                                         toggleBookMark(item.title, item.bookPage, item.itemId, item.type).then(() => {
-                                            this.bookMarks.splice(index, 1)
+                                        }).catch((error: Error) => {
+                                            promptAction.showToast(error)
                                         })
                                     }
                                 }

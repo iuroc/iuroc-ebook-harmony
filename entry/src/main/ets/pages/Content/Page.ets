@@ -5,6 +5,7 @@ import {
     getBookMarks,
     getCatalogTitleByBookPage,
     getContentAndCatalog,
+    loadReadSetting,
     makePageHTML,
     toggleBookMark,
     updateReadHistory
@@ -13,7 +14,7 @@ import { webview } from "@kit.ArkWeb"
 import { apiOrigin } from "../../common/config"
 import { CatalogInInfo, InfoType, IssueInfoNoCatalogsInResponse } from "../Catalog/util"
 import { BSColor } from "@iuroc/bootstrap5-color"
-import { WebReadBox } from "./WebReadBox"
+import { SettingOptionObservedV2, WebReadBox } from "./WebReadBox"
 import { CatalogDialog } from "./dialogs/CatalogDialog"
 import { BookListItemInResponse } from "../Index/common/mixin"
 import { BookMarkDialog } from "./dialogs/BookMarkDialog"
@@ -39,6 +40,7 @@ struct Page {
      * 当前书刊的书签列表的 Book 页码序列
      */
     @Local bookMarks: BookMarkInResponse[] = []
+    @Local readSettingOptions: SettingOptionObservedV2 = loadReadSetting()
     /** 当前正文缓存中的最大页码，每次写入正文缓存，都会更新该值
      *
      * 该值不等于正文 Map 的项目数量，因为正文 Map 初始只是存储了请求页码周期的内容数据 */
@@ -49,6 +51,7 @@ struct Page {
     @Local noMore: boolean = false
     private catalogDialogId: number = 0
     private bookMarkDialogId: number = 0
+    private settingDialogId: number = 0
     /** 当前阅读内容所属的图书或期刊的详情 */
     @Local itemInfo: IssueInfoNoCatalogsInResponse | BookListItemInResponse | null = null
 
@@ -72,7 +75,6 @@ struct Page {
         }).catch((error: Error) => {
             promptAction.showToast(error)
         })
-        this.changeToPage(param.currentBookPage)
     }
 
     /**
@@ -112,7 +114,7 @@ struct Page {
         this.navTitle = getCatalogTitleByBookPage(page, this.catalogs)
         // 将翻页的目标正文载入到 Web 容器
         this.webController.loadData(
-            makePageHTML(this.contentMap.get(page)!.content),
+            makePageHTML(this.contentMap.get(page)!.content, this.readSettingOptions),
             'text/html', 'utf-8', apiOrigin
         )
         await updateReadHistory(this.itemId as number, this.contentType as InfoType, page)
@@ -147,7 +149,9 @@ struct Page {
                     webController: this.webController,
                     itemInfo: this.itemInfo as IssueInfoNoCatalogsInResponse | BookListItemInResponse,
                     currentBookPage: this.currentBookPage,
-                    contentType: this.contentType as 'book' | 'issue'
+                    contentType: this.contentType as 'book' | 'issue',
+                    readSettingOptions: this.readSettingOptions,
+                    changeToPage: page => this.changeToPage(page),
                 }).height('100%')
                 this.BottomPanel()
             }
@@ -191,12 +195,15 @@ struct Page {
             {
                 value: '书刊详情',
                 action: () => {
-                    this.pathInfos.popToName('Catalog')
+                    this.pathInfos.popToName('Catalog', {
+                        currentBookPage: this.currentBookPage
+                    } as ContentPagePopResult)
                 },
                 symbolIcon: new SymbolGlyphModifier($r('sys.symbol.AI_circle_viewfinder'))
             },
             {
                 value: '书签列表',
+                isEnabled: this.bookMarks.length > 0,
                 action: () => {
                     promptAction.openCustomDialog({
                         builder: () => {
@@ -213,14 +220,14 @@ struct Page {
                 },
                 symbolIcon: new SymbolGlyphModifier($r('sys.symbol.gearshape'))
             },
-            {
-                // 统计一些字段的值，比如当前的行间距，字号，背景颜色，历史阅读记录，当前页码，总页码等
-                value: '统计信息',
-                action: () => {
-
-                },
-                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.info_circle'))
-            }
+        // {
+        //     // 统计一些字段的值，比如当前的行间距，字号，背景颜色，历史阅读记录，当前页码，总页码等
+        //     value: '统计信息',
+        //     action: () => {
+        //
+        //     },
+        //     symbolIcon: new SymbolGlyphModifier($r('sys.symbol.info_circle'))
+        // }
         ])
 
     }

@@ -3,6 +3,7 @@ import { ComposeListItem } from "@ohos.arkui.advanced.ComposeListItem"
 import { promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
 import { BSColor } from "@iuroc/bootstrap5-color"
 import { NoteViewPageParam } from "./View/Page"
+import { formatDateChinese } from "../../common/util"
 
 @ComponentV2
 struct Page {
@@ -28,7 +29,7 @@ struct Page {
                             contentItem: {
                                 primaryText: note.title,
                                 secondaryText: note.content,
-                                description: note.createAt
+                                description: `创建于` + formatDateChinese(new Date(note.createAt), true)
                             }
                         })
                             .onClick(() => {

@@ -11,10 +11,11 @@ import {
 import { ApiResponse, BookListItemInResponse } from '../Index/common/mixin'
 import { Content } from '../Index/common/lib'
 import { systemShare } from '@kit.ShareKit'
-import { uniformTypeDescriptor as utd } from '@kit.ArkData'
+import { preferences, uniformTypeDescriptor as utd } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { common } from '@kit.AbilityKit'
 import { BusinessError } from '@kit.BasicServicesKit'
+import { SettingOptionObservedV2, themeGroup } from './WebReadBox'
 
 export async function updateReadHistory(bookIdOrIssueId: number, type: InfoType, currentBookPage: number) {
     const request = http.createHttp()
@@ -92,7 +93,7 @@ export async function getInfoOnly<T extends BookListItemInResponse | IssueInfoNo
 }
 
 
-export function makePageHTML(content: string) {
+export function makePageHTML(content: string, settingOption: SettingOptionObservedV2) {
     return `
     <!DOCTYPE html>
     <html>
@@ -108,9 +109,11 @@ export function makePageHTML(content: string) {
 
             body {
                 margin: 0;
-                letter-spacing: 1px;
-                line-height: 1.5;
+                letter-spacing: ${settingOption.cssLetterSpacing};
+                line-height: ${settingOption.cssLineHeight};
                 text-align: justify;
+                color: ${themeGroup[settingOption.themeIndex].fontColor};
+                background-color: ${themeGroup[settingOption.themeIndex].backgroundColor};
             }
         </style>
     </head>
@@ -204,4 +207,30 @@ export interface BookMarkNoDate {
 export interface BookMarkInResponse extends BookMarkNoDate {
     updateAt: string
     createAt: string
+}
+
+/**
+ * 从用户首选项加载阅读设置项
+ */
+export function loadReadSetting() {
+    const data = preferences.getPreferencesSync(getContext(), { name: 'ReadSetting' })
+    const option = new SettingOptionObservedV2()
+    option.cssFontSize = data.getSync('cssFontSize', '26px') as string
+    option.cssLineHeight = data.getSync('cssLineHeight', '1.5') as string
+    option.cssLetterSpacing = data.getSync('cssLetterSpacing', '1px') as string
+    option.themeIndex = data.getSync('themeIndex', 0) as number
+    return option
+}
+
+/**
+ * 保存阅读设置项到用户首选项
+ * @param option
+ */
+export function saveReadSetting(option: SettingOptionObservedV2) {
+    const data = preferences.getPreferencesSync(getContext(), { name: 'ReadSetting' })
+    data.putSync('cssFontSize', option.cssFontSize)
+    data.putSync('cssLineHeight', option.cssLineHeight)
+    data.putSync('cssLetterSpacing', option.cssLetterSpacing)
+    data.putSync('themeIndex', option.themeIndex)
+    data.flush()
 }

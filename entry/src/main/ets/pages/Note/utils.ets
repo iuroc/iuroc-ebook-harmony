@@ -100,4 +100,5 @@ export interface NoteNoDate {
 
 export interface NoteInResponse extends NoteNoDate {
     createAt: string
+    updateAt: string
 }

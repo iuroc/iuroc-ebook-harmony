@@ -4,11 +4,14 @@ import { BSColor } from "@iuroc/bootstrap5-color"
 import { NoteEditPageParam } from "../Edit/Page"
 import { systemShareTextWithToast } from "@iuroc/chat-page"
 import { NotePagePopParam } from "../Page"
+import { formatDateChinese } from "../../../common/util"
 
 @ComponentV2
 struct Page {
     @Local title: string = ''
     @Local content: string = ''
+    @Local createAt: string = ''
+    @Local updateAt: string = ''
     @Local noteId: number = 0
     @Consumer() pathInfos: NavPathStack = new NavPathStack()
     hasBeEdit = false
@@ -28,6 +31,8 @@ struct Page {
         getOneNote(this.noteId).then(note => {
             this.title = note.title
             this.content = note.content
+            this.createAt = note.createAt
+            this.updateAt = note.updateAt
         }).catch((error: Error) => {
             promptAction.showToast(error)
         })
@@ -45,6 +50,10 @@ struct Page {
                         .width('100%')
                         .fontSize(18)
                         .copyOption(CopyOptions.LocalDevice)
+                    Text(`创建于 ${formatDateChinese(new Date(this.createAt))}`)
+                        .fontColor(BSColor.secondary)
+                        .width('100%')
+                        .fontSize(14)
                     Divider()
                     Text(this.content)
                         .textAlign(TextAlign.JUSTIFY)

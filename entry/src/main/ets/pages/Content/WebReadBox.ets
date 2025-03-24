@@ -2,12 +2,14 @@ import { webview } from '@kit.ArkWeb'
 import { promptAction } from '@kit.ArkUI'
 import { ChatDialog, ChatDialogMode } from './dialogs/Chat'
 import { ChatCompletionMessageParam } from '@iuroc/openai/src/main/ets/openai@4.73.1/resources'
-import { systemShareTextWithToast } from './util'
+import { loadReadSetting, systemShareTextWithToast } from './util'
 import { WebPageParam } from '../Web/Page'
 import { url } from '@kit.ArkTS'
 import { createNote } from '../Note/utils'
 import { IssueInfoNoCatalogsInResponse } from '../Catalog/util'
 import { BookListItemInResponse } from '../Index/common/mixin'
+import { BSColor } from '@iuroc/bootstrap5-color'
+import { ReadStreamOptions } from '@ohos.file.fs'
 
 @ComponentV2
 export struct WebReadBox {
@@ -17,11 +19,20 @@ export struct WebReadBox {
     @Require @Param itemInfo: IssueInfoNoCatalogsInResponse | BookListItemInResponse
     @Require @Param currentBookPage: number
     @Require @Param contentType: 'book' | 'issue'
+    @Require @Param readSettingOptions: SettingOptionObservedV2
+    @Require @Param changeToPage: (page: number) => Promise<void>
+
+    aboutToAppear(): void {
+
+    }
 
     build() {
         Web({ src: '', controller: this.webController })
             .overScrollMode(OverScrollMode.ALWAYS)
             .width('100%')
+            .onControllerAttached(() => {
+                this.changeToPage(this.currentBookPage)
+            })
             .selectionMenuOptions([
                 {
                     content: '简单总结',
@@ -138,4 +149,28 @@ export struct WebReadBox {
             mode: mode
         })
     }
+}
+
+export interface ThemeGroupItem {
+    fontColor: string
+    backgroundColor: string
+}
+
+export const themeGroup: ThemeGroupItem[] = [
+    {
+        fontColor: BSColor.dark,
+        backgroundColor: BSColor.white
+    },
+    {
+        fontColor: BSColor.success_text_emphasis,
+        backgroundColor: BSColor.success_bg_subtle
+    }
+]
+
+@ObservedV2
+export class SettingOptionObservedV2 {
+    @Trace themeIndex: number = 0
+    @Trace cssFontSize: string = '16px'
+    @Trace cssLineHeight: string = '1.5'
+    @Trace cssLetterSpacing: string = '1px'
 }
