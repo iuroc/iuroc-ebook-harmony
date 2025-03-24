@@ -16,6 +16,7 @@ import { promptAction } from '@kit.ArkUI'
 import { common } from '@kit.AbilityKit'
 import { BusinessError } from '@kit.BasicServicesKit'
 import { SettingOptionObservedV2, themeGroup } from './WebReadBox'
+import { webview } from '@kit.ArkWeb'
 
 export async function updateReadHistory(bookIdOrIssueId: number, type: InfoType, currentBookPage: number) {
     const request = http.createHttp()
@@ -112,6 +113,7 @@ export function makePageHTML(content: string, settingOption: SettingOptionObserv
                 letter-spacing: ${settingOption.cssLetterSpacing};
                 line-height: ${settingOption.cssLineHeight};
                 text-align: justify;
+                font-size: ${settingOption.cssFontSize};
                 color: ${themeGroup[settingOption.themeIndex].fontColor};
                 background-color: ${themeGroup[settingOption.themeIndex].backgroundColor};
             }
@@ -215,7 +217,7 @@ export interface BookMarkInResponse extends BookMarkNoDate {
 export function loadReadSetting() {
     const data = preferences.getPreferencesSync(getContext(), { name: 'ReadSetting' })
     const option = new SettingOptionObservedV2()
-    option.cssFontSize = data.getSync('cssFontSize', '26px') as string
+    option.cssFontSize = data.getSync('cssFontSize', '16px') as string
     option.cssLineHeight = data.getSync('cssLineHeight', '1.5') as string
     option.cssLetterSpacing = data.getSync('cssLetterSpacing', '1px') as string
     option.themeIndex = data.getSync('themeIndex', 0) as number
@@ -233,4 +235,13 @@ export function saveReadSetting(option: SettingOptionObservedV2) {
     data.putSync('cssLetterSpacing', option.cssLetterSpacing)
     data.putSync('themeIndex', option.themeIndex)
     data.flush()
+}
+
+export function updateWebSetting(controller: webview.WebviewController, setting: SettingOptionObservedV2) {
+    const theme = themeGroup[setting.themeIndex]
+    controller.runJavaScript(`document.body.style.color = '${theme.fontColor}'`)
+    controller.runJavaScript(`document.body.style.backgroundColor = '${theme.backgroundColor}'`)
+    controller.runJavaScript(`document.body.style.fontSize = '${setting.cssFontSize}'`)
+    controller.runJavaScript(`document.body.style.lineHeight = '${setting.cssLineHeight}'`)
+    controller.runJavaScript(`document.body.style.letterSpacing = '${setting.cssLetterSpacing}'`)
 }

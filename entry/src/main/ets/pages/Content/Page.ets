@@ -14,10 +14,11 @@ import { webview } from "@kit.ArkWeb"
 import { apiOrigin } from "../../common/config"
 import { CatalogInInfo, InfoType, IssueInfoNoCatalogsInResponse } from "../Catalog/util"
 import { BSColor } from "@iuroc/bootstrap5-color"
-import { SettingOptionObservedV2, WebReadBox } from "./WebReadBox"
+import { SettingOptionObservedV2, themeGroup, WebReadBox } from "./WebReadBox"
 import { CatalogDialog } from "./dialogs/CatalogDialog"
 import { BookListItemInResponse } from "../Index/common/mixin"
 import { BookMarkDialog } from "./dialogs/BookMarkDialog"
+import { SettingDialog } from "./dialogs/SettingDialog"
 
 @ComponentV2
 struct Page {
@@ -216,7 +217,11 @@ struct Page {
             {
                 value: '阅读设置',
                 action: () => {
-
+                    promptAction.openCustomDialog({
+                        builder: () => {
+                            this.SettingDialog()
+                        }
+                    }).then(id => this.settingDialogId = id)
                 },
                 symbolIcon: new SymbolGlyphModifier($r('sys.symbol.gearshape'))
             },
@@ -229,7 +234,7 @@ struct Page {
         //     symbolIcon: new SymbolGlyphModifier($r('sys.symbol.info_circle'))
         // }
         ])
-
+        .backgroundColor(themeGroup[this.readSettingOptions.themeIndex].backgroundColor)
     }
 
     @Builder
@@ -239,6 +244,17 @@ struct Page {
             currentBookPage: this.currentBookPage,
             changeToPage: page => this.changeToPage(page),
             close: () => promptAction.closeCustomDialog(this.catalogDialogId)
+        })
+    }
+
+    @Builder
+    SettingDialog() {
+        SettingDialog({
+            readSettingOptions: this.readSettingOptions,
+            webController: this.webController,
+            closeDialog: () => {
+                promptAction.closeCustomDialog(this.settingDialogId)
+            }
         })
     }
 
@@ -276,7 +292,7 @@ struct Page {
                 })
                 .smButton()
         }
-        .backgroundColor(Color.White)
+        .backgroundColor(themeGroup[this.readSettingOptions.themeIndex].backgroundColor)
         .shadow(ShadowStyle.OUTER_DEFAULT_XS)
         .borderRadius('50%')
         .padding(5)

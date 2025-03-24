@@ -2,7 +2,7 @@ import { webview } from '@kit.ArkWeb'
 import { promptAction } from '@kit.ArkUI'
 import { ChatDialog, ChatDialogMode } from './dialogs/Chat'
 import { ChatCompletionMessageParam } from '@iuroc/openai/src/main/ets/openai@4.73.1/resources'
-import { loadReadSetting, systemShareTextWithToast } from './util'
+import { loadReadSetting, systemShareTextWithToast, updateWebSetting } from './util'
 import { WebPageParam } from '../Web/Page'
 import { url } from '@kit.ArkTS'
 import { createNote } from '../Note/utils'
@@ -33,6 +33,7 @@ export struct WebReadBox {
             .onControllerAttached(() => {
                 this.changeToPage(this.currentBookPage)
             })
+            .backgroundColor(themeGroup[this.readSettingOptions.themeIndex].backgroundColor)
             .selectionMenuOptions([
                 {
                     content: '简单总结',
@@ -154,17 +155,63 @@ export struct WebReadBox {
 export interface ThemeGroupItem {
     fontColor: string
     backgroundColor: string
+    groupName: string
 }
 
-export const themeGroup: ThemeGroupItem[] = [
-    {
-        fontColor: BSColor.dark,
-        backgroundColor: BSColor.white
-    },
-    {
-        fontColor: BSColor.success_text_emphasis,
-        backgroundColor: BSColor.success_bg_subtle
+@ObservedV2
+export class ThemeGroupItemObservedV2 {
+    @Trace fontColor: string
+    @Trace backgroundColor: string
+    @Trace groupName: string
+
+    constructor(init: ThemeGroupItem) {
+        this.fontColor = init.fontColor
+        this.backgroundColor = init.backgroundColor
+        this.groupName = init.groupName
     }
+}
+
+export const themeGroup: ThemeGroupItemObservedV2[] = [
+    new ThemeGroupItemObservedV2({
+        fontColor: BSColor.dark,
+        backgroundColor: BSColor.white,
+        groupName: '默认'
+    }),
+    new ThemeGroupItemObservedV2({
+        fontColor: BSColor.success_text_emphasis,
+        backgroundColor: BSColor.success_bg_subtle,
+        groupName: 'success'
+    }),
+    new ThemeGroupItemObservedV2({
+        fontColor: BSColor.danger_text_emphasis,
+        backgroundColor: BSColor.danger_bg_subtle,
+        groupName: 'danger'
+    }),
+    new ThemeGroupItemObservedV2({
+        fontColor: BSColor.primary_text_emphasis,
+        backgroundColor: BSColor.primary_bg_subtle,
+        groupName: 'primary'
+    }),
+    new ThemeGroupItemObservedV2({
+        fontColor: BSColor.warning_text_emphasis,
+        backgroundColor: BSColor.warning_bg_subtle,
+        groupName: 'warning'
+    }),
+    new ThemeGroupItemObservedV2({
+        fontColor: BSColor.secondary_text_emphasis,
+        backgroundColor: BSColor.secondary_bg_subtle,
+        groupName: 'secondary'
+    }),
+    new ThemeGroupItemObservedV2({
+        fontColor: BSColor.dark_text_emphasis,
+        backgroundColor: BSColor.dark_bg_subtle,
+        groupName: 'dark'
+    }),
+    new ThemeGroupItemObservedV2({
+        fontColor: BSColor.info_text_emphasis,
+        backgroundColor: BSColor.info_bg_subtle,
+        groupName: 'info'
+    }),
 ]
 
 @ObservedV2
