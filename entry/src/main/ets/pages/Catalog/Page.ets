@@ -18,6 +18,7 @@ import { extname, extToMime, getPreviewFileUriForImageURL, replaceChinesePunctua
 import { filePreview } from '@kit.PreviewKit'
 import { ContentPageParam, ContentPagePopResult } from '../Content/Page'
 import { getCatalogTitleByBookPage } from '../Content/util'
+import { MainPagePopParam } from '../Index/Page'
 
 @ComponentV2
 struct FieldRow {
@@ -59,10 +60,11 @@ struct Page {
     @Local bookInfo?: BookInfoObservedV2
     @Local issueInfo?: IssueInfoInObservedV2
     @Consumer() pathInfos: NavPathStack = new NavPathStack()
+    @Event changeIsInBookShelf: (value: boolean | null) => void
     /**
      * 是否已在书架
      */
-    @Local isInBookShelf: boolean | null = null
+    @Require @Param isInBookShelf: boolean | null
     /** 当前读到第几页了 */
     @Local currentBookPage: number | null = null
 
@@ -84,7 +86,7 @@ struct Page {
                 }),
                 // 判断是否在书架中
                 getOneBookShelf(this.itemId as number, this.type as InfoType).then(result => {
-                    this.isInBookShelf = !!result
+                    this.changeIsInBookShelf(!!result)
                 }),
                 // 获取当前阅读进度，用于在目录中高亮显示
                 getOneReadHistory(this.itemId as number, this.type as InfoType).then(result => {
@@ -313,9 +315,9 @@ struct Page {
                         )
                         .layoutWeight(1)
                         .onClick(() => {
-                            this.isInBookShelf = null
+                            this.changeIsInBookShelf(null)
                             toggleBookShelf(this.itemId as number, this.type as InfoType).then(result => {
-                                this.isInBookShelf = result.isInBookShelf
+                                this.changeIsInBookShelf(result.isInBookShelf)
                             }).catch((error: Error) => {
                                 promptAction.showToast(error)
                             })
@@ -369,6 +371,8 @@ struct Page {
 @ComponentV2
 struct PageNav {
     @Local navTitle: string = ''
+    @Consumer() pathInfos: NavPathStack = new NavPathStack()
+    @Local isInBookShelf: boolean | null = null
 
     build() {
         NavDestination() {
@@ -376,6 +380,10 @@ struct PageNav {
                 changeNavTitle: title => {
                     this.navTitle = title
                 },
+                isInBookShelf: this.isInBookShelf,
+                changeIsInBookShelf: value => {
+                    this.isInBookShelf = value
+                }
             })
         }
         .title(this.navTitle)
@@ -385,6 +393,13 @@ struct PageNav {
                 symbolIcon: new SymbolGlyphModifier($r('sys.symbol.share')),
             }
         ])
+        .onBackPressed(() => {
+            this.pathInfos.pop({
+                reloadBookShelf: true,
+                inBookshelf: this.isInBookShelf
+            } as MainPagePopParam)
+            return true
+        })
     }
 }
 

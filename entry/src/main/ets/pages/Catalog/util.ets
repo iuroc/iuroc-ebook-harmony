@@ -75,7 +75,7 @@ export async function getOneBookShelf(itemId: number, type: InfoType) {
         extraData: JSON.stringify({ itemId, type }),
         expectDataType: http.HttpDataType.OBJECT
     })
-    const result = response.result as ApiResponse<BookShelfInResponse>
+    const result = response.result as ApiResponse<BookShelfItemInResponse>
     if (!result.success) {
         return false
     }
@@ -97,7 +97,7 @@ export async function toggleBookShelf(itemId: number, type: InfoType) {
     return result.data
 }
 
-export interface BookShelfInResponse {
+export interface BookShelfItemInResponse {
     id: number
     itemId: number
     type: InfoType

@@ -1,5 +1,6 @@
 import { CatalogPageParam } from '../../../Catalog/Page'
 import { ItemCard } from '../../components/ItemCard'
+import { MainPagePopParam } from '../../Page'
 
 @ComponentV2
 export struct BookListItemCard {
@@ -11,6 +12,9 @@ export struct BookListItemCard {
     @Require @Param cover: string
     @Require @Param bigCover: string
     @Consumer() pathInfos: NavPathStack = new NavPathStack()
+    @Param inBookshelf: boolean = false
+    @Param reloadBookShelf: () => void = () => {
+    }
 
     build() {
         ItemCard({
@@ -28,7 +32,15 @@ export struct BookListItemCard {
                     name: 'Catalog', param: {
                         itemId: this.itemId,
                         type: 'book'
-                    } as CatalogPageParam
+                    } as CatalogPageParam,
+                    onPop: info => {
+                        if (info.result) {
+                            const result = info.result as MainPagePopParam
+                            if (result.reloadBookShelf && !result.inBookshelf) {
+                                this.reloadBookShelf()
+                            }
+                        }
+                    }
                 })
             })
     }

@@ -24,6 +24,7 @@ struct Page {
                 Column({ space: 5 }) {
                     Text('格式要求 10-30 位任意字符').fontSize(10).width('100%').padding({ left: 15 })
                     TextInput({ placeholder: '请输入密码', text: $$this.i_password })
+                        .type(InputType.Password)
                         .border({
                             width: 1,
                             color: this.i_password.length == 0 || this.checkPassword() ? Color.Transparent :

@@ -1,13 +1,7 @@
 import { SymbolGlyphModifier } from '@kit.ArkUI'
-import {
-    checkToken,
-    getUseInfoFromPreferences,
-    saveUserInfoToPreferences,
-    TokenError,
-    UserInResponse
-} from '../../common/token'
+import { checkToken, saveUserInfoToPreferences, TokenError, UserInResponse } from '../../common/token'
 import { BookListItem, BookPanel } from './panels/book/BookPanel'
-import { RecommendPanel } from './panels/recommend/RecommendPanel'
+import { BookshelfPanel } from './panels/bookshelf/BookshelfPanel'
 import { common } from '@kit.AbilityKit'
 import { UserPanel } from './panels/user/UserPanel'
 import { MagazineListItem, MagazinePanel } from './panels/magazine/MagazinePanel'
@@ -30,8 +24,8 @@ struct Page {
     ]
     @Local showNavigation: boolean = false
     @Local showContent: boolean = false
-    // RecommendPanel
-    @Local recommendPanelNeedInit: boolean = true
+    // BookshelfPanel
+    @Local bookshelfPanelNeedInit: boolean = true
     // BookPanel
     @Local bookPanelNeedInit: boolean = true
     @Local bookPanelActiveCategoryIndex: number = 0
@@ -63,7 +57,7 @@ struct Page {
     @Builder
     NavigationContent() {
         if (this.activePageIndex == 0) {
-            RecommendPanel()
+            BookshelfPanel()
         } else if (this.activePageIndex == 1) {
             BookPanel({
                 needInit: this.bookPanelNeedInit,
@@ -147,4 +141,9 @@ struct Page {
             }
         ]
     }
+}
+
+export interface MainPagePopParam {
+    reloadBookShelf?: boolean
+    inBookshelf?: boolean
 }

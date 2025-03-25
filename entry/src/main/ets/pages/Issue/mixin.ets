@@ -2,6 +2,7 @@ import { http } from '@kit.NetworkKit'
 import { apiOrigin } from '../../common/config'
 import { getToken } from '../../common/token'
 import { ApiResponse } from '../Index/common/mixin'
+import { MagazineListItem } from '../Index/panels/magazine/MagazinePanel'
 
 export async function getIssues(magazineId: number, page = 0, pageSize = 72) {
     const request = http.createHttp()
@@ -26,4 +27,5 @@ export interface IssueInResponse {
     name: string
     cover: string
     index: number
+    magazine?: MagazineListItem
 }
