@@ -19,6 +19,7 @@ import { filePreview } from '@kit.PreviewKit'
 import { ContentPageParam, ContentPagePopResult } from '../Content/Page'
 import { getCatalogTitleByBookPage } from '../Content/util'
 import { MainPagePopParam } from '../Index/Page'
+import { systemShareTextWithToast } from '@iuroc/chat-page/src/main/ets/utils/utils'
 
 @ComponentV2
 struct FieldRow {
@@ -391,6 +392,9 @@ struct PageNav {
             {
                 value: '分享书刊',
                 symbolIcon: new SymbolGlyphModifier($r('sys.symbol.share')),
+                action: () => {
+
+                }
             }
         ])
         .onBackPressed(() => {

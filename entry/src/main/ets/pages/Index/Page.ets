@@ -100,7 +100,10 @@ struct Page {
             },
             {
                 value: '助手',
-                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.vertical_flip'))
+                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.ellipsis_message')),
+                action: () => {
+                    this.pathInfos.pushPath({ name: 'Chat' })
+                }
             }
         ])
         .toolbarConfiguration(
