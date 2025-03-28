@@ -44,6 +44,11 @@
             "name": "Chat",
             "pageSourceFile": "src/main/ets/pages/Chat/Page.ets",
             "buildFunction": "PageBuilder"
+        },
+        {
+            "name": "Search",
+            "pageSourceFile": "src/main/ets/pages/Search/Page.ets",
+            "buildFunction": "PageBuilder"
         }
     ]
 }

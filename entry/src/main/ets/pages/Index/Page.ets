@@ -95,11 +95,14 @@ struct Page {
         .title(this.titles[this.activePageIndex])
         .menus([
             {
-                value: '搜索',
+                value: '书刊搜索',
                 symbolIcon: new SymbolGlyphModifier($r('sys.symbol.magnifyingglass')),
+                action: () => {
+                    this.pathInfos.pushPath({ name: 'Search' })
+                }
             },
             {
-                value: '助手',
+                value: '智能助手',
                 symbolIcon: new SymbolGlyphModifier($r('sys.symbol.ellipsis_message')),
                 action: () => {
                     this.pathInfos.pushPath({ name: 'Chat' })
@@ -108,8 +111,10 @@ struct Page {
         ])
         .toolbarConfiguration(
             this.toolbarItems().map((item, index) => {
-                item.action = () => this.activePageIndex = index
                 item.status = this.activePageIndex == index ? ToolbarItemStatus.ACTIVE : ToolbarItemStatus.NORMAL
+                item.action = () => {
+                    this.activePageIndex = index
+                }
                 return item
             })
         )
