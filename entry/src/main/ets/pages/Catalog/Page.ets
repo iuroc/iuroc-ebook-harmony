@@ -388,15 +388,6 @@ struct PageNav {
             })
         }
         .title(this.navTitle)
-        .menus([
-            {
-                value: '分享书刊',
-                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.share')),
-                action: () => {
-
-                }
-            }
-        ])
         .onBackPressed(() => {
             this.pathInfos.pop({
                 reloadBookShelf: true,
