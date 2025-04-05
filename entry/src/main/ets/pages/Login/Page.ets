@@ -4,8 +4,8 @@ import { loginOrRegister } from './mixin'
 
 @ComponentV2
 struct Page {
-    @Local i_username: string = 'hello'
-    @Local i_password: string = '12345678abc'
+    @Local i_username: string = ''
+    @Local i_password: string = ''
     @Consumer() pathInfos: NavPathStack = new NavPathStack()
 
     build() {
