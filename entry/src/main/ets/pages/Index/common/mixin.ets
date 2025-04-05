@@ -38,14 +38,20 @@ export interface ApiResponse<T = null> {
 }
 
 export async function getItems<T extends BookListItemInResponse | MagazineItemInResponse>(
-    categoryId: number,
+    categoryId: number = -1,
     page = 0,
-    pageSize = 72
+    pageSize = 72,
+    keyword = ''
 ) {
     const request = http.createHttp()
     const response = await request.request(apiOrigin + '/api/ebook/item', {
         method: http.RequestMethod.POST,
-        extraData: JSON.stringify({ categoryId, page, pageSize }),
+        extraData: JSON.stringify({
+            categoryId: categoryId == -1 ? undefined : categoryId,
+            page,
+            pageSize,
+            keyword
+        }),
         header: {
             token: await getToken(),
             'Content-Type': 'application/json'
@@ -67,6 +73,10 @@ export interface CommonListItem {
     cover: string
 }
 
-export interface BookListItemInResponse extends BookListItem {}
+export interface BookListItemInResponse extends BookListItem {
+    type: 'book'
+}
 
-export interface MagazineItemInResponse extends MagazineListItem {}
+export interface MagazineItemInResponse extends MagazineListItem {
+    type: 'magazine'
+}

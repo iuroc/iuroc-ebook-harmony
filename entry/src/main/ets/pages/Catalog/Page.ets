@@ -428,6 +428,7 @@ export class BookInfoObservedV2 implements BookInfoInResponse {
     @Trace summary: string
     @Trace cover: string
     @Trace isbn: string
+    type: 'book' = 'book'
 
     constructor(init: BookInfoInResponse) {
         this.catalogs = init.catalogs
