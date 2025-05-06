@@ -28,6 +28,20 @@ export struct UserPanel {
             ListItem() {
                 ComposeListItem({
                     contentItem: {
+                        primaryText: '阅读历史',
+                        secondaryText: '查看您看过的书',
+                        iconStyle: IconType.SYSTEM_ICON,
+                        icon: $r('app.media.share')
+                    }
+                })
+                    .onClick(() => {
+                        this.pathInfos.pushPath({ name: 'History' })
+                    })
+            }
+
+            ListItem() {
+                ComposeListItem({
+                    contentItem: {
                         primaryText: '退出登录',
                         secondaryText: '您的云端数据不会被删除',
                         iconStyle: IconType.SYSTEM_ICON,

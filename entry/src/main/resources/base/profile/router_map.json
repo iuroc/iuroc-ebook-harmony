@@ -1,54 +1,59 @@
 {
-    "routerMap": [
-        {
-            "name": "Login",
-            "pageSourceFile": "src/main/ets/pages/Login/Page.ets",
-            "buildFunction": "PageBuilder"
-        },
-        {
-            "name": "Issue",
-            "pageSourceFile": "src/main/ets/pages/Issue/Page.ets",
-            "buildFunction": "PageBuilder"
-        },
-        {
-            "name": "Catalog",
-            "pageSourceFile": "src/main/ets/pages/Catalog/Page.ets",
-            "buildFunction": "PageBuilder"
-        },
-        {
-            "name": "Content",
-            "pageSourceFile": "src/main/ets/pages/Content/Page.ets",
-            "buildFunction": "PageBuilder"
-        },
-        {
-            "name": "Web",
-            "pageSourceFile": "src/main/ets/pages/Web/Page.ets",
-            "buildFunction": "PageBuilder"
-        },
-        {
-            "name": "Note",
-            "pageSourceFile": "src/main/ets/pages/Note/Page.ets",
-            "buildFunction": "PageBuilder"
-        },
-        {
-            "name": "NoteEdit",
-            "pageSourceFile": "src/main/ets/pages/Note/Edit/Page.ets",
-            "buildFunction": "PageBuilder"
-        },
-        {
-            "name": "NoteView",
-            "pageSourceFile": "src/main/ets/pages/Note/View/Page.ets",
-            "buildFunction": "PageBuilder"
-        },
-        {
-            "name": "Chat",
-            "pageSourceFile": "src/main/ets/pages/Chat/Page.ets",
-            "buildFunction": "PageBuilder"
-        },
-        {
-            "name": "Search",
-            "pageSourceFile": "src/main/ets/pages/Search/Page.ets",
-            "buildFunction": "PageBuilder"
-        }
-    ]
+  "routerMap": [
+    {
+      "name": "Login",
+      "pageSourceFile": "src/main/ets/pages/Login/Page.ets",
+      "buildFunction": "PageBuilder"
+    },
+    {
+      "name": "Issue",
+      "pageSourceFile": "src/main/ets/pages/Issue/Page.ets",
+      "buildFunction": "PageBuilder"
+    },
+    {
+      "name": "Catalog",
+      "pageSourceFile": "src/main/ets/pages/Catalog/Page.ets",
+      "buildFunction": "PageBuilder"
+    },
+    {
+      "name": "Content",
+      "pageSourceFile": "src/main/ets/pages/Content/Page.ets",
+      "buildFunction": "PageBuilder"
+    },
+    {
+      "name": "Web",
+      "pageSourceFile": "src/main/ets/pages/Web/Page.ets",
+      "buildFunction": "PageBuilder"
+    },
+    {
+      "name": "Note",
+      "pageSourceFile": "src/main/ets/pages/Note/Page.ets",
+      "buildFunction": "PageBuilder"
+    },
+    {
+      "name": "NoteEdit",
+      "pageSourceFile": "src/main/ets/pages/Note/Edit/Page.ets",
+      "buildFunction": "PageBuilder"
+    },
+    {
+      "name": "NoteView",
+      "pageSourceFile": "src/main/ets/pages/Note/View/Page.ets",
+      "buildFunction": "PageBuilder"
+    },
+    {
+      "name": "Chat",
+      "pageSourceFile": "src/main/ets/pages/Chat/Page.ets",
+      "buildFunction": "PageBuilder"
+    },
+    {
+      "name": "Search",
+      "pageSourceFile": "src/main/ets/pages/Search/Page.ets",
+      "buildFunction": "PageBuilder"
+    },
+    {
+      "name": "History",
+      "pageSourceFile": "src/main/ets/pages/History/Page.ets",
+      "buildFunction": "PageBuilder"
+    }
+  ]
 }
