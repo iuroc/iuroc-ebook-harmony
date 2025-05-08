@@ -37,6 +37,10 @@ export interface ApiResponse<T = null> {
     message: string
 }
 
+export function makeImageSrc(src: string) {
+    return src.startsWith('/') ? (apiOrigin + src) : src
+}
+
 export async function getItems<T extends BookListItemInResponse | MagazineItemInResponse>(
     categoryId: number = -1,
     page = 0,

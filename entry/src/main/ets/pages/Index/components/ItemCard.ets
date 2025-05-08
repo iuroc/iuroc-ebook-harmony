@@ -1,7 +1,7 @@
 import { BSColor } from '@iuroc/bootstrap5-color'
 import { apiOrigin } from '../../../common/config'
 import { replaceChinesePunctuation } from '../../../common/util'
-import { EbookType } from '../common/mixin'
+import { EbookType, makeImageSrc } from '../common/mixin'
 
 @ComponentV2
 export struct ItemCard {
@@ -22,7 +22,7 @@ export struct ItemCard {
 
     build() {
         Row({ space: 10 }) {
-            Image(apiOrigin + this.cover).width(100 * 0.8).height(140 * 0.8)
+            Image(makeImageSrc(this.cover)).width(100 * 0.8).height(140 * 0.8)
                 .borderRadius(5)
                 .shadow(ShadowStyle.OUTER_DEFAULT_XS)
             Column({ space: 5 }) {

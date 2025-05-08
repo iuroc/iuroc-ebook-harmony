@@ -178,7 +178,7 @@ export const themeGroup: ThemeGroupItemObservedV2[] = [
     new ThemeGroupItemObservedV2({
         fontColor: BSColor.dark,
         mainColor: BSColor.primary,
-        backgroundColor: Color.Transparent,
+        backgroundColor: Color.White,
         groupName: '默认'
     }),
     new ThemeGroupItemObservedV2({
