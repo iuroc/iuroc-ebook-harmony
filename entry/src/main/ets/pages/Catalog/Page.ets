@@ -20,6 +20,7 @@ import { ContentPageParam, ContentPagePopResult } from '../Content/Page'
 import { getCatalogTitleByBookPage } from '../Content/util'
 import { MainPagePopParam } from '../Index/Page'
 import { systemShareTextWithToast } from '@iuroc/chat-page/src/main/ets/utils/utils'
+import { makeImageSrc } from '../Index/common/mixin'
 
 @ComponentV2
 struct FieldRow {
@@ -248,9 +249,9 @@ struct Page {
     }
 
     getCover(useBig: boolean) {
-        return apiOrigin + (this.type == 'book'
+        return makeImageSrc((this.type == 'book'
             ? (useBig ? this.bookInfo?.bigCover : this.bookInfo?.cover)
-            : this.issueInfo?.cover)
+            : this.issueInfo?.cover) || '') as string
     }
 
     @Builder
