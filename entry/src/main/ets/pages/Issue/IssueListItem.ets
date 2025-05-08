@@ -1,6 +1,7 @@
 import { BSColor } from "@iuroc/bootstrap5-color"
 import { apiOrigin } from "../../common/config"
 import { CatalogPageParam } from "../Catalog/Page"
+import { makeImageSrc } from "../Index/common/mixin"
 import { MainPagePopParam } from "../Index/Page"
 import { MagazineListItem } from "../Index/panels/magazine/MagazinePanel"
 import { IssueListItem } from "./Page"
@@ -17,11 +18,11 @@ export struct IssueListItemCard {
     build() {
         Row({ space: 10 }) {
             if (this.inBookshelf) {
-                Image(apiOrigin + this.issue.cover).width(100 * 0.8).height(140 * 0.8)
+                Image(makeImageSrc(this.issue.cover)).width(100 * 0.8).height(140 * 0.8)
                     .borderRadius(5)
                     .shadow(ShadowStyle.OUTER_DEFAULT_XS)
             } else {
-                Image(apiOrigin + this.issue.cover).width(50).height(70)
+                Image(makeImageSrc(this.issue.cover)).width(50).height(70)
                     .borderRadius(5)
                     .shadow(ShadowStyle.OUTER_DEFAULT_XS)
             }
