@@ -62,7 +62,7 @@ export struct SettingDialog {
                 .layoutWeight(1)
                 .showSteps(true)
                 .onChange((value, mode) => {
-                    if (mode == SliderChangeMode.Moving) {
+                    if (mode == SliderChangeMode.Moving || mode == SliderChangeMode.Click) {
                         this.updateAndSaveWebSetting()
                     }
                 })
@@ -86,7 +86,7 @@ export struct SettingDialog {
                 .layoutWeight(1)
                 .showSteps(true)
                 .onChange((value, mode) => {
-                    if (mode == SliderChangeMode.Moving) {
+                    if (mode == SliderChangeMode.Moving || mode == SliderChangeMode.Click) {
                         this.readSettingOptions.cssLetterSpacing = value / 10
                         this.updateAndSaveWebSetting()
                     }
@@ -114,7 +114,7 @@ export struct SettingDialog {
                 .layoutWeight(1)
                 .showSteps(true)
                 .onChange((value, mode) => {
-                    if (mode == SliderChangeMode.Moving) {
+                    if (mode == SliderChangeMode.Moving || mode == SliderChangeMode.Click) {
                         this.readSettingOptions.cssLineHeight = value / 10
                         this.updateAndSaveWebSetting()
                     }
